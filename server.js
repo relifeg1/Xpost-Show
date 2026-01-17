@@ -1,9 +1,8 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require("socket.io");
-const clipboardy = require('clipboardy'); // ملاحظة: النسخ لن يعمل في السيرفر السحابي
+const clipboardy = require('clipboardy');
 const axios = require('axios');
-const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -12,11 +11,12 @@ const io = new Server(server);
 app.use(express.json());
 app.use(express.static('public'));
 
-const DB_FILE = 'database.json';
+// 🔥 إعدادات الحفظ (JSONBlob) - تم دمج الرابط الخاص بك 🔥
+const BLOB_ID = '019bcdd9-7c76-7d01-a193-def55c292a99'; 
+const API_URL = `https://jsonblob.com/api/jsonBlob/${BLOB_ID}`;
+
 let queue = [];
 let currentIndex = -1;
-
-// حالة التشغيل التلقائي
 let autoState = { active: false, timer: null };
 
 // الإعدادات العامة
@@ -26,15 +26,43 @@ let globalSettings = {
     defaultDuration: 10
 };
 
-// تحميل البيانات (إن وجدت)
-if (fs.existsSync(DB_FILE)) {
-    try { queue = JSON.parse(fs.readFileSync(DB_FILE, 'utf8')); } catch (e) { queue = []; }
+// --- دوال الحفظ والاسترجاع السحابية ---
+
+async function loadDatabase() {
+    try {
+        console.log("☁️ جاري الاتصال بـ JSONBlob...");
+        const res = await axios.get(API_URL);
+        const data = res.data;
+        
+        if (data) {
+            if (data.queue) queue = data.queue;
+            if (data.settings) globalSettings = data.settings;
+            console.log(`✅ تم استرجاع ${queue.length} تغريدة.`);
+            updateAdmin();
+        }
+    } catch (e) {
+        console.error("⚠️ لم يتم العثور على بيانات سابقة أو حدث خطأ:", e.message);
+    }
 }
 
-function saveDatabase() {
-    // محاولة الحفظ (في Render البيانات قد تمسح عند إعادة التشغيل وهذا طبيعي للخطة المجانية)
-    try { fs.writeFileSync(DB_FILE, JSON.stringify(queue, null, 2)); } catch (e) { console.error("Save Error", e); }
+async function saveDatabase() {
+    try {
+        const payload = {
+            queue: queue,
+            settings: globalSettings,
+            updatedAt: new Date().toISOString()
+        };
+        await axios.put(API_URL, payload, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+        console.log("💾 تم الحفظ في JSONBlob.");
+    } catch (e) {
+        console.error("❌ فشل الحفظ السحابي:", e.message);
+    }
 }
+
+// تحميل البيانات عند بدء التشغيل
+loadDatabase();
 
 function updateAdmin() {
     io.emit('state_update', { 
@@ -44,7 +72,6 @@ function updateAdmin() {
 
 function showTweet(index) {
     if (index < 0 || index >= queue.length) return;
-    
     currentIndex = index;
     const tweet = queue[currentIndex];
     const finalSettings = { ...globalSettings, ...(tweet.customSettings || {}) };
@@ -52,23 +79,19 @@ function showTweet(index) {
     io.emit('show_tweet', { 
         data: tweet, index: currentIndex + 1, total: queue.length, settings: finalSettings
     });
-    
     updateAdmin();
 
     if (autoState.active) {
         clearTimeout(autoState.timer);
         const duration = (tweet.customDuration || globalSettings.defaultDuration) * 1000;
-        console.log(`⏱️ Auto Next in: ${duration/1000}s`);
         autoState.timer = setTimeout(() => {
             showTweet((currentIndex + 1) % queue.length);
         }, duration);
     }
 }
 
-// دالة المعالجة الموحدة للإضافة
 async function processAdd(url, res) {
     const idMatch = url && url.match(/(?:twitter|x)\.com\/.*\/status\/(\d+)/);
-    
     if (idMatch && idMatch[1]) {
         if (queue.find(t => t.id_str === idMatch[1])) {
             return res.send ? res.send("Already Exists") : res.json({ success: false, msg: 'موجودة مسبقاً' });
@@ -76,32 +99,30 @@ async function processAdd(url, res) {
         try {
             const resp = await axios.get(`https://cdn.syndication.twimg.com/tweet-result?id=${idMatch[1]}&token=x`);
             queue.push({ ...resp.data, customSettings: null, customDuration: null });
-            saveDatabase();
+            
             updateAdmin();
+            saveDatabase(); // حفظ سحابي
+            
             return res.send ? res.send("Added") : res.json({ success: true });
         } catch (e) { 
-            return res.send ? res.send("Error Fetching") : res.status(500).json({ error: 'فشل الجلب من المصدر' }); 
+            return res.send ? res.send("Error") : res.status(500).json({ error: 'فشل الجلب' }); 
         }
     } else {
-        return res.send ? res.send("Invalid Link") : res.status(400).json({ error: 'رابط غير صحيح' });
+        return res.send ? res.send("Invalid Link") : res.status(400).json({ error: 'رابط خطأ' });
     }
 }
 
 // --- APIs ---
 
 app.post('/api/add', async (req, res) => {
-    // محاولة استخدام الرابط المرسل، وإذا لم يوجد نحاول القراءة من السيرفر (لن يعمل في السحاب)
     let url = req.body.url;
-    if (!url) {
-        try { url = await clipboardy.read(); } catch(e) { console.log("Clipboard not available on server"); }
-    }
+    // محاولة القراءة من الحافظة (للمحلي فقط)
+    if (!url) { try { url = await clipboardy.read(); } catch(e) {} }
     await processAdd(url, res);
 });
 
 app.post('/api/control', (req, res) => {
     const { action, index } = req.body;
-    if (queue.length === 0) return res.json({ success: false });
-
     if (action === 'show') showTweet(index);
     else if (action === 'next') showTweet((currentIndex + 1) % queue.length);
     else if (action === 'prev') showTweet((currentIndex - 1 + queue.length) % queue.length);
@@ -121,8 +142,8 @@ app.post('/api/edit_tweet', (req, res) => {
     if (queue[index]) {
         queue[index].customSettings = customSettings;
         queue[index].customDuration = customDuration;
-        saveDatabase();
         if (currentIndex === index) showTweet(index); else updateAdmin();
+        saveDatabase(); // حفظ سحابي
     }
     res.json({ success: true });
 });
@@ -144,8 +165,10 @@ app.post('/api/manage', (req, res) => {
         [queue[index], queue[index + 1]] = [queue[index + 1], queue[index]];
         if(currentIndex === index) currentIndex++; else if(currentIndex === index+1) currentIndex--;
     }
-    saveDatabase(); updateAdmin();
+    
+    updateAdmin();
     if (action.includes('move') && currentIndex !== -1) showTweet(currentIndex);
+    saveDatabase(); // حفظ سحابي
     res.json({ success: true });
 });
 
@@ -153,57 +176,20 @@ app.post('/api/settings', (req, res) => {
     globalSettings = { ...globalSettings, ...req.body };
     io.emit('state_update', { settings: globalSettings });
     if (currentIndex !== -1 && !queue[currentIndex].customSettings) showTweet(currentIndex);
+    saveDatabase(); // حفظ سحابي
     res.json({ success: true });
 });
 
-
-// 🔥 روابط Stream Deck 🔥
-
-// 1. إضافة (لن تعمل في Render من الحافظة، يجب الإرسال من الأدمن)
+// Stream Deck Links
 app.get('/trigger_add', async (req, res) => {
-    try {
-        const url = await clipboardy.read(); // سيفشل في السحاب
-        await processAdd(url, res);
-    } catch (e) {
-        res.send("Server cannot read clipboard (Use Admin Panel)");
-    }
+    try { const url = await clipboardy.read(); await processAdd(url, res); } catch(e) { res.send("Clipboard Error (Use Admin Panel)"); }
 });
-
-// 2. تلقائي
-app.get('/trigger_auto', (req, res) => {
-    if (queue.length === 0) return res.send("Empty");
-    autoState.active = !autoState.active;
-    if (autoState.active) {
-        if (currentIndex === -1) showTweet(0); else showTweet(currentIndex);
-    } else {
-        clearTimeout(autoState.timer); updateAdmin();
-    }
-    res.send(autoState.active ? "Auto ON" : "Auto OFF");
-});
-
-// 3. التالي
-app.get('/trigger_next', (req, res) => {
-    if (queue.length === 0) return res.send("Empty");
-    showTweet((currentIndex + 1) % queue.length);
-    res.send("Next");
-});
-
-// 4. السابق
-app.get('/trigger_prev', (req, res) => {
-    if (queue.length === 0) return res.send("Empty");
-    showTweet((currentIndex - 1 + queue.length) % queue.length);
-    res.send("Prev");
-});
-
-// 5. إخفاء
-app.get('/hide', (req, res) => { 
-    io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; updateAdmin(); res.send('Hidden'); 
-});
+app.get('/trigger_next', (req, res) => { if(queue.length){ showTweet((currentIndex + 1) % queue.length); res.send("Next"); } else res.send("Empty"); });
+app.get('/trigger_prev', (req, res) => { if(queue.length){ showTweet((currentIndex - 1 + queue.length) % queue.length); res.send("Prev"); } else res.send("Empty"); });
+app.get('/trigger_auto', (req, res) => { autoState.active = !autoState.active; if(autoState.active) (currentIndex===-1?showTweet(0):showTweet(currentIndex)); else { clearTimeout(autoState.timer); updateAdmin(); } res.send(autoState.active?"Auto ON":"Auto OFF"); });
+app.get('/hide', (req, res) => { io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; updateAdmin(); res.send('Hidden'); });
 
 io.on('connection', (s) => updateAdmin());
 
-// 🛑 التعديل المهم لـ Render 🛑
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+server.listen(PORT, () => console.log(`🚀 JSONBlob Server running on port ${PORT}`));
