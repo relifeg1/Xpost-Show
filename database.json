@@ -1,0 +1,1761 @@
+[
+  {
+    "__typename": "Tweet",
+    "lang": "ar",
+    "favorite_count": 3974,
+    "possibly_sensitive": false,
+    "created_at": "2026-01-17T17:53:39.000Z",
+    "display_text_range": [
+      0,
+      79
+    ],
+    "entities": {
+      "hashtags": [],
+      "urls": [],
+      "user_mentions": [],
+      "symbols": [],
+      "media": [
+        {
+          "display_url": "pic.x.com/Vnf0sdRaty",
+          "expanded_url": "https://x.com/Jamil_Alhasaan/status/2012584113673277678/video/1",
+          "indices": [
+            80,
+            103
+          ],
+          "url": "https://t.co/Vnf0sdRaty"
+        }
+      ]
+    },
+    "id_str": "2012584113673277678",
+    "text": "أسرى من فلول نظام الأسد البائد وقعوا أثناء مقاومتهم محيط مطار الطبقة بريف الرقة https://t.co/Vnf0sdRaty",
+    "user": {
+      "id_str": "773883614828306433",
+      "name": "جميل الحسن",
+      "screen_name": "Jamil_Alhasaan",
+      "is_blue_verified": true,
+      "profile_image_shape": "Circle",
+      "verified": false,
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1641171895927046144/TFw78Nzb_normal.jpg"
+    },
+    "edit_control": {
+      "edit_tweet_ids": [
+        "2012584113673277678"
+      ],
+      "editable_until_msecs": "1768676019000",
+      "is_edit_eligible": true,
+      "edits_remaining": "5"
+    },
+    "mediaDetails": [
+      {
+        "additional_media_info": {},
+        "display_url": "pic.x.com/Vnf0sdRaty",
+        "expanded_url": "https://x.com/Jamil_Alhasaan/status/2012584113673277678/video/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          80,
+          103
+        ],
+        "media_url_https": "https://pbs.twimg.com/amplify_video_thumb/2012583605361389569/img/IFvIyimcTqAdxobX.jpg",
+        "original_info": {
+          "height": 1920,
+          "width": 1080,
+          "focus_rects": []
+        },
+        "sizes": {
+          "large": {
+            "h": 1920,
+            "resize": "fit",
+            "w": 1080
+          },
+          "medium": {
+            "h": 1200,
+            "resize": "fit",
+            "w": 675
+          },
+          "small": {
+            "h": 680,
+            "resize": "fit",
+            "w": 383
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "video",
+        "url": "https://t.co/Vnf0sdRaty",
+        "video_info": {
+          "aspect_ratio": [
+            9,
+            16
+          ],
+          "duration_millis": 50677,
+          "variants": [
+            {
+              "content_type": "application/x-mpegURL",
+              "url": "https://video.twimg.com/amplify_video/2012583605361389569/pl/kxHYIyajDip7hYJS.m3u8"
+            },
+            {
+              "bitrate": 632000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/2012583605361389569/vid/avc1/320x568/XndJahManYNU6gWD.mp4"
+            },
+            {
+              "bitrate": 950000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/2012583605361389569/vid/avc1/480x852/_sBDqx0vBoZ6ogl_.mp4"
+            },
+            {
+              "bitrate": 2176000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/2012583605361389569/vid/avc1/720x1280/kXKuQnglnZeT1Z7Q.mp4"
+            },
+            {
+              "bitrate": 10368000,
+              "content_type": "video/mp4",
+              "url": "https://video.twimg.com/amplify_video/2012583605361389569/vid/avc1/1080x1920/lnd0I5dECPpntxVw.mp4"
+            }
+          ]
+        }
+      }
+    ],
+    "photos": [],
+    "video": {
+      "aspectRatio": [
+        9,
+        16
+      ],
+      "contentType": "media_entity",
+      "durationMs": 50677,
+      "mediaAvailability": {
+        "status": "available"
+      },
+      "poster": "https://pbs.twimg.com/amplify_video_thumb/2012583605361389569/img/IFvIyimcTqAdxobX.jpg",
+      "variants": [
+        {
+          "type": "application/x-mpegURL",
+          "src": "https://video.twimg.com/amplify_video/2012583605361389569/pl/kxHYIyajDip7hYJS.m3u8"
+        },
+        {
+          "type": "video/mp4",
+          "src": "https://video.twimg.com/amplify_video/2012583605361389569/vid/avc1/320x568/XndJahManYNU6gWD.mp4"
+        },
+        {
+          "type": "video/mp4",
+          "src": "https://video.twimg.com/amplify_video/2012583605361389569/vid/avc1/480x852/_sBDqx0vBoZ6ogl_.mp4"
+        },
+        {
+          "type": "video/mp4",
+          "src": "https://video.twimg.com/amplify_video/2012583605361389569/vid/avc1/720x1280/kXKuQnglnZeT1Z7Q.mp4"
+        },
+        {
+          "type": "video/mp4",
+          "src": "https://video.twimg.com/amplify_video/2012583605361389569/vid/avc1/1080x1920/lnd0I5dECPpntxVw.mp4"
+        }
+      ],
+      "videoId": {
+        "type": "tweet",
+        "id": "2012584113673277678"
+      },
+      "viewCount": 0
+    },
+    "conversation_count": 103,
+    "news_action_type": "conversation",
+    "isEdited": false,
+    "isStaleEdit": false
+  },
+  {
+    "__typename": "Tweet",
+    "lang": "en",
+    "favorite_count": 492,
+    "possibly_sensitive": false,
+    "created_at": "2026-01-17T13:26:12.000Z",
+    "display_text_range": [
+      0,
+      133
+    ],
+    "entities": {
+      "hashtags": [],
+      "urls": [],
+      "user_mentions": [],
+      "symbols": [],
+      "media": [
+        {
+          "display_url": "pic.x.com/9HmMwOCaSU",
+          "expanded_url": "https://x.com/EWC_Extra/status/2012516807450436083/photo/1",
+          "indices": [
+            133,
+            156
+          ],
+          "url": "https://t.co/9HmMwOCaSU"
+        }
+      ]
+    },
+    "id_str": "2012516807450436083",
+    "text": "Twenty teams remain. One title awaits.\n\nMeet the squads advancing to tomorrow’s Match Point Finals at the ALGS: 2026 Championship. 🏆 https://t.co/9HmMwOCaSU",
+    "user": {
+      "id_str": "1922270795306553344",
+      "name": "EWC Extra",
+      "screen_name": "EWC_Extra",
+      "is_blue_verified": true,
+      "profile_image_shape": "Square",
+      "verified": false,
+      "verified_type": "Business",
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1922274100904435712/s7A4JT_d_normal.jpg",
+      "highlighted_label": {
+        "description": "Esports World Cup",
+        "badge": {
+          "url": "https://pbs.twimg.com/profile_images/1924640285952258048/iFwi7xcA_bigger.jpg"
+        },
+        "url": {
+          "url": "https://twitter.com/EWC_EN",
+          "url_type": "DeepLink"
+        },
+        "user_label_type": "BusinessLabel",
+        "user_label_display_type": "Badge"
+      }
+    },
+    "edit_control": {
+      "edit_tweet_ids": [
+        "2012516807450436083"
+      ],
+      "editable_until_msecs": "1768659972000",
+      "is_edit_eligible": true,
+      "edits_remaining": "5"
+    },
+    "mediaDetails": [
+      {
+        "display_url": "pic.x.com/9HmMwOCaSU",
+        "expanded_url": "https://x.com/EWC_Extra/status/2012516807450436083/photo/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          133,
+          156
+        ],
+        "media_url_https": "https://pbs.twimg.com/media/G-3jf9rWAAAGD_C.jpg",
+        "original_info": {
+          "height": 1350,
+          "width": 1080,
+          "focus_rects": [
+            {
+              "x": 0,
+              "y": 69,
+              "w": 1080,
+              "h": 605
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1080,
+              "h": 1080
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1080,
+              "h": 1231
+            },
+            {
+              "x": 169,
+              "y": 0,
+              "w": 675,
+              "h": 1350
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1080,
+              "h": 1350
+            }
+          ]
+        },
+        "sizes": {
+          "large": {
+            "h": 1350,
+            "resize": "fit",
+            "w": 1080
+          },
+          "medium": {
+            "h": 1200,
+            "resize": "fit",
+            "w": 960
+          },
+          "small": {
+            "h": 680,
+            "resize": "fit",
+            "w": 544
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "photo",
+        "url": "https://t.co/9HmMwOCaSU"
+      }
+    ],
+    "photos": [
+      {
+        "backgroundColor": {
+          "red": 204,
+          "green": 214,
+          "blue": 221
+        },
+        "cropCandidates": [
+          {
+            "x": 0,
+            "y": 69,
+            "w": 1080,
+            "h": 605
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1080,
+            "h": 1080
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1080,
+            "h": 1231
+          },
+          {
+            "x": 169,
+            "y": 0,
+            "w": 675,
+            "h": 1350
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1080,
+            "h": 1350
+          }
+        ],
+        "expandedUrl": "https://x.com/EWC_Extra/status/2012516807450436083/photo/1",
+        "url": "https://pbs.twimg.com/media/G-3jf9rWAAAGD_C.jpg",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "conversation_count": 21,
+    "news_action_type": "conversation",
+    "isEdited": false,
+    "isStaleEdit": false,
+    "customSettings": {
+      "showAvatar": true,
+      "showName": true,
+      "showMedia": false,
+      "showStats": true,
+      "showDate": true,
+      "scale": 1
+    },
+    "customDuration": null
+  },
+  {
+    "__typename": "Tweet",
+    "lang": "ar",
+    "favorite_count": 2061,
+    "possibly_sensitive": false,
+    "created_at": "2026-01-17T08:12:59.000Z",
+    "display_text_range": [
+      0,
+      139
+    ],
+    "entities": {
+      "hashtags": [],
+      "urls": [],
+      "user_mentions": [],
+      "symbols": [],
+      "media": [
+        {
+          "display_url": "pic.x.com/kN3Rcsatu7",
+          "expanded_url": "https://x.com/ahmadsaleem5/status/2012437985149534641/photo/1",
+          "indices": [
+            140,
+            163
+          ],
+          "url": "https://t.co/kN3Rcsatu7"
+        }
+      ]
+    },
+    "id_str": "2012437985149534641",
+    "text": "صار أكثر من نصف أكراد سورية تحت سلطة الدولة السورية.\nوصارت نسبة الأكراد في مناطق سيطرة عصابات البككة-البيدة-قسد..\nأقل من 15٪ من السكان فيها https://t.co/kN3Rcsatu7",
+    "user": {
+      "id_str": "402118846",
+      "name": "Ahmad Kamel",
+      "screen_name": "ahmadsaleem5",
+      "is_blue_verified": true,
+      "profile_image_shape": "Circle",
+      "verified": false,
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/772673395867680769/7sBEp84b_normal.jpg"
+    },
+    "edit_control": {
+      "edit_tweet_ids": [
+        "2012437985149534641"
+      ],
+      "editable_until_msecs": "1768641179000",
+      "is_edit_eligible": true,
+      "edits_remaining": "5"
+    },
+    "mediaDetails": [
+      {
+        "display_url": "pic.x.com/kN3Rcsatu7",
+        "expanded_url": "https://x.com/ahmadsaleem5/status/2012437985149534641/photo/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          140,
+          163
+        ],
+        "media_url_https": "https://pbs.twimg.com/media/G-2dmqfW0AALXmQ.jpg",
+        "original_info": {
+          "height": 1121,
+          "width": 1280,
+          "focus_rects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 717
+            },
+            {
+              "x": 159,
+              "y": 0,
+              "w": 1121,
+              "h": 1121
+            },
+            {
+              "x": 297,
+              "y": 0,
+              "w": 983,
+              "h": 1121
+            },
+            {
+              "x": 719,
+              "y": 0,
+              "w": 561,
+              "h": 1121
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 1121
+            }
+          ]
+        },
+        "sizes": {
+          "large": {
+            "h": 1121,
+            "resize": "fit",
+            "w": 1280
+          },
+          "medium": {
+            "h": 1051,
+            "resize": "fit",
+            "w": 1200
+          },
+          "small": {
+            "h": 596,
+            "resize": "fit",
+            "w": 680
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "photo",
+        "url": "https://t.co/kN3Rcsatu7"
+      }
+    ],
+    "photos": [
+      {
+        "backgroundColor": {
+          "red": 204,
+          "green": 214,
+          "blue": 221
+        },
+        "cropCandidates": [
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 717
+          },
+          {
+            "x": 159,
+            "y": 0,
+            "w": 1121,
+            "h": 1121
+          },
+          {
+            "x": 297,
+            "y": 0,
+            "w": 983,
+            "h": 1121
+          },
+          {
+            "x": 719,
+            "y": 0,
+            "w": 561,
+            "h": 1121
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 1121
+          }
+        ],
+        "expandedUrl": "https://x.com/ahmadsaleem5/status/2012437985149534641/photo/1",
+        "url": "https://pbs.twimg.com/media/G-2dmqfW0AALXmQ.jpg",
+        "width": 1280,
+        "height": 1121
+      }
+    ],
+    "conversation_count": 68,
+    "news_action_type": "conversation",
+    "isEdited": false,
+    "isStaleEdit": false,
+    "customSettings": {
+      "showAvatar": false,
+      "showName": true,
+      "showMedia": true,
+      "showStats": true,
+      "showDate": true,
+      "scale": 1
+    },
+    "customDuration": 5
+  },
+  {
+    "__typename": "Tweet",
+    "lang": "ar",
+    "favorite_count": 292,
+    "possibly_sensitive": false,
+    "created_at": "2026-01-17T16:11:35.000Z",
+    "display_text_range": [
+      0,
+      282
+    ],
+    "entities": {
+      "hashtags": [],
+      "urls": [],
+      "user_mentions": [],
+      "symbols": [],
+      "media": [
+        {
+          "display_url": "pic.x.com/OXGnBPrrvS",
+          "expanded_url": "https://x.com/SenseiFund/status/2012558427302605202/photo/1",
+          "indices": [
+            277,
+            300
+          ],
+          "url": "https://t.co/OXGnBPrrvS"
+        }
+      ]
+    },
+    "id_str": "2012558427302605202",
+    "text": "خبر جوهري آخر يؤثر بشكل مباشر على العقار 🏙️\n\n— البنك المركزي السعودي 🏛️🇸🇦\n\nألزم جميع البنوك ألا تحتفظ بالعقارات التي تملكها بسبب تعثر العملاء لفترة طويلة 🏠❌\n\nويجب عليها بيعها خلال 3 سنوات كحد أقصى ⏱️\n\nكما ألزم البنوك بتقديم خطة واضحة كل سنة توضح متى وكيف ستبيع هذه العقارات 🏷️ https://t.co/OXGnBPrrvS",
+    "user": {
+      "id_str": "1260561790431309826",
+      "name": "المخضرم 先生",
+      "screen_name": "SenseiFund",
+      "is_blue_verified": true,
+      "profile_image_shape": "Circle",
+      "verified": false,
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1905308316818944000/shbx-hRg_normal.jpg"
+    },
+    "edit_control": {
+      "edit_tweet_ids": [
+        "2012558427302605202"
+      ],
+      "editable_until_msecs": "1768669895000",
+      "is_edit_eligible": false,
+      "edits_remaining": "5"
+    },
+    "mediaDetails": [
+      {
+        "display_url": "pic.x.com/OXGnBPrrvS",
+        "expanded_url": "https://x.com/SenseiFund/status/2012558427302605202/photo/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          277,
+          300
+        ],
+        "media_url_https": "https://pbs.twimg.com/media/G-4LOE1WUAAi6kQ.jpg",
+        "original_info": {
+          "height": 857,
+          "width": 1200,
+          "focus_rects": [
+            {
+              "x": 0,
+              "y": 185,
+              "w": 1200,
+              "h": 672
+            },
+            {
+              "x": 172,
+              "y": 0,
+              "w": 857,
+              "h": 857
+            },
+            {
+              "x": 224,
+              "y": 0,
+              "w": 752,
+              "h": 857
+            },
+            {
+              "x": 386,
+              "y": 0,
+              "w": 429,
+              "h": 857
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1200,
+              "h": 857
+            }
+          ]
+        },
+        "sizes": {
+          "large": {
+            "h": 857,
+            "resize": "fit",
+            "w": 1200
+          },
+          "medium": {
+            "h": 857,
+            "resize": "fit",
+            "w": 1200
+          },
+          "small": {
+            "h": 486,
+            "resize": "fit",
+            "w": 680
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "photo",
+        "url": "https://t.co/OXGnBPrrvS"
+      },
+      {
+        "display_url": "pic.x.com/OXGnBPrrvS",
+        "expanded_url": "https://x.com/SenseiFund/status/2012558427302605202/photo/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          277,
+          300
+        ],
+        "media_url_https": "https://pbs.twimg.com/media/G-4LOE9XUAEupSw.jpg",
+        "original_info": {
+          "height": 720,
+          "width": 1280,
+          "focus_rects": [
+            {
+              "x": 0,
+              "y": 3,
+              "w": 1280,
+              "h": 717
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 720,
+              "h": 720
+            },
+            {
+              "x": 36,
+              "y": 0,
+              "w": 632,
+              "h": 720
+            },
+            {
+              "x": 172,
+              "y": 0,
+              "w": 360,
+              "h": 720
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 720
+            }
+          ]
+        },
+        "sizes": {
+          "large": {
+            "h": 720,
+            "resize": "fit",
+            "w": 1280
+          },
+          "medium": {
+            "h": 675,
+            "resize": "fit",
+            "w": 1200
+          },
+          "small": {
+            "h": 383,
+            "resize": "fit",
+            "w": 680
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "photo",
+        "url": "https://t.co/OXGnBPrrvS"
+      }
+    ],
+    "photos": [
+      {
+        "backgroundColor": {
+          "red": 204,
+          "green": 214,
+          "blue": 221
+        },
+        "cropCandidates": [
+          {
+            "x": 0,
+            "y": 185,
+            "w": 1200,
+            "h": 672
+          },
+          {
+            "x": 172,
+            "y": 0,
+            "w": 857,
+            "h": 857
+          },
+          {
+            "x": 224,
+            "y": 0,
+            "w": 752,
+            "h": 857
+          },
+          {
+            "x": 386,
+            "y": 0,
+            "w": 429,
+            "h": 857
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1200,
+            "h": 857
+          }
+        ],
+        "expandedUrl": "https://x.com/SenseiFund/status/2012558427302605202/photo/1",
+        "url": "https://pbs.twimg.com/media/G-4LOE1WUAAi6kQ.jpg",
+        "width": 1200,
+        "height": 857
+      },
+      {
+        "backgroundColor": {
+          "red": 204,
+          "green": 214,
+          "blue": 221
+        },
+        "cropCandidates": [
+          {
+            "x": 0,
+            "y": 3,
+            "w": 1280,
+            "h": 717
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 720,
+            "h": 720
+          },
+          {
+            "x": 36,
+            "y": 0,
+            "w": 632,
+            "h": 720
+          },
+          {
+            "x": 172,
+            "y": 0,
+            "w": 360,
+            "h": 720
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 720
+          }
+        ],
+        "expandedUrl": "https://x.com/SenseiFund/status/2012558427302605202/photo/1",
+        "url": "https://pbs.twimg.com/media/G-4LOE9XUAEupSw.jpg",
+        "width": 1280,
+        "height": 720
+      }
+    ],
+    "conversation_count": 25,
+    "news_action_type": "conversation",
+    "quoted_tweet": {
+      "lang": "ar",
+      "reply_count": 11,
+      "retweet_count": 14,
+      "favorite_count": 163,
+      "possibly_sensitive": false,
+      "created_at": "2025-09-25T12:28:42.000Z",
+      "display_text_range": [
+        0,
+        55
+      ],
+      "entities": {
+        "hashtags": [],
+        "urls": [],
+        "user_mentions": [],
+        "symbols": [],
+        "media": [
+          {
+            "display_url": "pic.x.com/XgEVYvq1y6",
+            "expanded_url": "https://x.com/SenseiFund/status/1971190122956849662/photo/1",
+            "indices": [
+              55,
+              78
+            ],
+            "url": "https://t.co/XgEVYvq1y6"
+          }
+        ]
+      },
+      "id_str": "1971190122956849662",
+      "text": "انا سعيد \nالامور متوجهة للأفضل ولن تسمعوا الا كل خير 🤍 https://t.co/XgEVYvq1y6",
+      "user": {
+        "id_str": "1260561790431309826",
+        "name": "المخضرم 先生",
+        "screen_name": "SenseiFund",
+        "is_blue_verified": true,
+        "profile_image_shape": "Circle",
+        "verified": false,
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/1905308316818944000/shbx-hRg_normal.jpg"
+      },
+      "edit_control": {
+        "edit_tweet_ids": [
+          "1971190122956849662"
+        ],
+        "editable_until_msecs": "1758806922000",
+        "is_edit_eligible": true,
+        "edits_remaining": "5"
+      },
+      "mediaDetails": [
+        {
+          "display_url": "pic.x.com/XgEVYvq1y6",
+          "expanded_url": "https://x.com/SenseiFund/status/1971190122956849662/photo/1",
+          "ext_media_availability": {
+            "status": "Available"
+          },
+          "indices": [
+            55,
+            78
+          ],
+          "media_url_https": "https://pbs.twimg.com/media/G1sS9ylWIAADpmx.jpg",
+          "original_info": {
+            "height": 1289,
+            "width": 1289,
+            "focus_rects": [
+              {
+                "x": 0,
+                "y": 122,
+                "w": 1289,
+                "h": 722
+              },
+              {
+                "x": 0,
+                "y": 0,
+                "w": 1289,
+                "h": 1289
+              },
+              {
+                "x": 158,
+                "y": 0,
+                "w": 1131,
+                "h": 1289
+              },
+              {
+                "x": 644,
+                "y": 0,
+                "w": 645,
+                "h": 1289
+              },
+              {
+                "x": 0,
+                "y": 0,
+                "w": 1289,
+                "h": 1289
+              }
+            ]
+          },
+          "sizes": {
+            "large": {
+              "h": 1289,
+              "resize": "fit",
+              "w": 1289
+            },
+            "medium": {
+              "h": 1200,
+              "resize": "fit",
+              "w": 1200
+            },
+            "small": {
+              "h": 680,
+              "resize": "fit",
+              "w": 680
+            },
+            "thumb": {
+              "h": 150,
+              "resize": "crop",
+              "w": 150
+            }
+          },
+          "type": "photo",
+          "url": "https://t.co/XgEVYvq1y6"
+        },
+        {
+          "display_url": "pic.x.com/XgEVYvq1y6",
+          "expanded_url": "https://x.com/SenseiFund/status/1971190122956849662/photo/1",
+          "ext_media_availability": {
+            "status": "Available"
+          },
+          "indices": [
+            55,
+            78
+          ],
+          "media_url_https": "https://pbs.twimg.com/media/G1sS9yqWkAAr6pD.jpg",
+          "original_info": {
+            "height": 1000,
+            "width": 1500,
+            "focus_rects": [
+              {
+                "x": 0,
+                "y": 160,
+                "w": 1500,
+                "h": 840
+              },
+              {
+                "x": 137,
+                "y": 0,
+                "w": 1000,
+                "h": 1000
+              },
+              {
+                "x": 199,
+                "y": 0,
+                "w": 877,
+                "h": 1000
+              },
+              {
+                "x": 387,
+                "y": 0,
+                "w": 500,
+                "h": 1000
+              },
+              {
+                "x": 0,
+                "y": 0,
+                "w": 1500,
+                "h": 1000
+              }
+            ]
+          },
+          "sizes": {
+            "large": {
+              "h": 1000,
+              "resize": "fit",
+              "w": 1500
+            },
+            "medium": {
+              "h": 800,
+              "resize": "fit",
+              "w": 1200
+            },
+            "small": {
+              "h": 453,
+              "resize": "fit",
+              "w": 680
+            },
+            "thumb": {
+              "h": 150,
+              "resize": "crop",
+              "w": 150
+            }
+          },
+          "type": "photo",
+          "url": "https://t.co/XgEVYvq1y6"
+        },
+        {
+          "display_url": "pic.x.com/XgEVYvq1y6",
+          "expanded_url": "https://x.com/SenseiFund/status/1971190122956849662/photo/1",
+          "ext_media_availability": {
+            "status": "Available"
+          },
+          "indices": [
+            55,
+            78
+          ],
+          "media_url_https": "https://pbs.twimg.com/media/G1sS9yoWUAAdPRX.jpg",
+          "original_info": {
+            "height": 1952,
+            "width": 1290,
+            "focus_rects": [
+              {
+                "x": 0,
+                "y": 566,
+                "w": 1290,
+                "h": 722
+              },
+              {
+                "x": 0,
+                "y": 282,
+                "w": 1290,
+                "h": 1290
+              },
+              {
+                "x": 0,
+                "y": 192,
+                "w": 1290,
+                "h": 1471
+              },
+              {
+                "x": 314,
+                "y": 0,
+                "w": 976,
+                "h": 1952
+              },
+              {
+                "x": 0,
+                "y": 0,
+                "w": 1290,
+                "h": 1952
+              }
+            ]
+          },
+          "sizes": {
+            "large": {
+              "h": 1952,
+              "resize": "fit",
+              "w": 1290
+            },
+            "medium": {
+              "h": 1200,
+              "resize": "fit",
+              "w": 793
+            },
+            "small": {
+              "h": 680,
+              "resize": "fit",
+              "w": 449
+            },
+            "thumb": {
+              "h": 150,
+              "resize": "crop",
+              "w": 150
+            }
+          },
+          "type": "photo",
+          "url": "https://t.co/XgEVYvq1y6"
+        }
+      ],
+      "photos": [
+        {
+          "backgroundColor": {
+            "red": 204,
+            "green": 214,
+            "blue": 221
+          },
+          "cropCandidates": [
+            {
+              "x": 0,
+              "y": 122,
+              "w": 1289,
+              "h": 722
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1289,
+              "h": 1289
+            },
+            {
+              "x": 158,
+              "y": 0,
+              "w": 1131,
+              "h": 1289
+            },
+            {
+              "x": 644,
+              "y": 0,
+              "w": 645,
+              "h": 1289
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1289,
+              "h": 1289
+            }
+          ],
+          "expandedUrl": "https://x.com/SenseiFund/status/1971190122956849662/photo/1",
+          "url": "https://pbs.twimg.com/media/G1sS9ylWIAADpmx.jpg",
+          "width": 1289,
+          "height": 1289
+        },
+        {
+          "backgroundColor": {
+            "red": 204,
+            "green": 214,
+            "blue": 221
+          },
+          "cropCandidates": [
+            {
+              "x": 0,
+              "y": 160,
+              "w": 1500,
+              "h": 840
+            },
+            {
+              "x": 137,
+              "y": 0,
+              "w": 1000,
+              "h": 1000
+            },
+            {
+              "x": 199,
+              "y": 0,
+              "w": 877,
+              "h": 1000
+            },
+            {
+              "x": 387,
+              "y": 0,
+              "w": 500,
+              "h": 1000
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1500,
+              "h": 1000
+            }
+          ],
+          "expandedUrl": "https://x.com/SenseiFund/status/1971190122956849662/photo/1",
+          "url": "https://pbs.twimg.com/media/G1sS9yqWkAAr6pD.jpg",
+          "width": 1500,
+          "height": 1000
+        },
+        {
+          "backgroundColor": {
+            "red": 204,
+            "green": 214,
+            "blue": 221
+          },
+          "cropCandidates": [
+            {
+              "x": 0,
+              "y": 566,
+              "w": 1290,
+              "h": 722
+            },
+            {
+              "x": 0,
+              "y": 282,
+              "w": 1290,
+              "h": 1290
+            },
+            {
+              "x": 0,
+              "y": 192,
+              "w": 1290,
+              "h": 1471
+            },
+            {
+              "x": 314,
+              "y": 0,
+              "w": 976,
+              "h": 1952
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1290,
+              "h": 1952
+            }
+          ],
+          "expandedUrl": "https://x.com/SenseiFund/status/1971190122956849662/photo/1",
+          "url": "https://pbs.twimg.com/media/G1sS9yoWUAAdPRX.jpg",
+          "width": 1290,
+          "height": 1952
+        }
+      ],
+      "isEdited": false,
+      "isStaleEdit": false
+    },
+    "isEdited": false,
+    "isStaleEdit": false,
+    "note_tweet": {
+      "id": "Tm90ZVR3ZWV0UmVzdWx0czoyMDEyNTU4NDI3MjE4NzU1NTg0"
+    }
+  },
+  {
+    "__typename": "Tweet",
+    "lang": "ar",
+    "favorite_count": 659,
+    "possibly_sensitive": false,
+    "created_at": "2026-01-17T15:49:28.000Z",
+    "display_text_range": [
+      0,
+      122
+    ],
+    "entities": {
+      "hashtags": [
+        {
+          "indices": [
+            81,
+            107
+          ],
+          "text": "الجمهورية_العربية_السورية"
+        },
+        {
+          "indices": [
+            109,
+            122
+          ],
+          "text": "وزارة_الطاقة"
+        }
+      ],
+      "urls": [],
+      "user_mentions": [],
+      "symbols": [],
+      "media": [
+        {
+          "display_url": "pic.x.com/POgb2rb4xl",
+          "expanded_url": "https://x.com/SyrMOfE/status/2012552863709307173/photo/1",
+          "indices": [
+            123,
+            146
+          ],
+          "url": "https://t.co/POgb2rb4xl"
+        }
+      ]
+    },
+    "id_str": "2012552863709307173",
+    "text": "بعد تحرير مسكنة ودير حافر.. استقرار الضخ في محطة البابيري بجهود الكوادر الوطنية\n\n#الجمهورية_العربية_السورية \n#وزارة_الطاقة https://t.co/POgb2rb4xl",
+    "user": {
+      "id_str": "1887088159793512448",
+      "name": "وزارة الطاقة السورية",
+      "screen_name": "SyrMOfE",
+      "is_blue_verified": false,
+      "profile_image_shape": "Circle",
+      "verified": false,
+      "verified_type": "Government",
+      "profile_image_url_https": "https://pbs.twimg.com/profile_images/1940859747294400512/8V--GhsF_normal.jpg"
+    },
+    "edit_control": {
+      "edit_tweet_ids": [
+        "2012552863709307173"
+      ],
+      "editable_until_msecs": "1768668568000",
+      "is_edit_eligible": false,
+      "edits_remaining": "5"
+    },
+    "mediaDetails": [
+      {
+        "display_url": "pic.x.com/POgb2rb4xl",
+        "expanded_url": "https://x.com/SyrMOfE/status/2012552863709307173/photo/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          123,
+          146
+        ],
+        "media_url_https": "https://pbs.twimg.com/media/G-4FtwpWIAMjvGf.jpg",
+        "original_info": {
+          "height": 960,
+          "width": 1280,
+          "focus_rects": [
+            {
+              "x": 0,
+              "y": 58,
+              "w": 1280,
+              "h": 717
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 960,
+              "h": 960
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 842,
+              "h": 960
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 480,
+              "h": 960
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 960
+            }
+          ]
+        },
+        "sizes": {
+          "large": {
+            "h": 960,
+            "resize": "fit",
+            "w": 1280
+          },
+          "medium": {
+            "h": 900,
+            "resize": "fit",
+            "w": 1200
+          },
+          "small": {
+            "h": 510,
+            "resize": "fit",
+            "w": 680
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "photo",
+        "url": "https://t.co/POgb2rb4xl"
+      },
+      {
+        "display_url": "pic.x.com/POgb2rb4xl",
+        "expanded_url": "https://x.com/SyrMOfE/status/2012552863709307173/photo/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          123,
+          146
+        ],
+        "media_url_https": "https://pbs.twimg.com/media/G-4Ftw3XEAA763Z.jpg",
+        "original_info": {
+          "height": 960,
+          "width": 1280,
+          "focus_rects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 717
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 960,
+              "h": 960
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 842,
+              "h": 960
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 480,
+              "h": 960
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 960
+            }
+          ]
+        },
+        "sizes": {
+          "large": {
+            "h": 960,
+            "resize": "fit",
+            "w": 1280
+          },
+          "medium": {
+            "h": 900,
+            "resize": "fit",
+            "w": 1200
+          },
+          "small": {
+            "h": 510,
+            "resize": "fit",
+            "w": 680
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "photo",
+        "url": "https://t.co/POgb2rb4xl"
+      },
+      {
+        "display_url": "pic.x.com/POgb2rb4xl",
+        "expanded_url": "https://x.com/SyrMOfE/status/2012552863709307173/photo/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          123,
+          146
+        ],
+        "media_url_https": "https://pbs.twimg.com/media/G-4Ftw9XQAAXCW9.jpg",
+        "original_info": {
+          "height": 960,
+          "width": 1280,
+          "focus_rects": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 717
+            },
+            {
+              "x": 160,
+              "y": 0,
+              "w": 960,
+              "h": 960
+            },
+            {
+              "x": 219,
+              "y": 0,
+              "w": 842,
+              "h": 960
+            },
+            {
+              "x": 400,
+              "y": 0,
+              "w": 480,
+              "h": 960
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 960
+            }
+          ]
+        },
+        "sizes": {
+          "large": {
+            "h": 960,
+            "resize": "fit",
+            "w": 1280
+          },
+          "medium": {
+            "h": 900,
+            "resize": "fit",
+            "w": 1200
+          },
+          "small": {
+            "h": 510,
+            "resize": "fit",
+            "w": 680
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "photo",
+        "url": "https://t.co/POgb2rb4xl"
+      },
+      {
+        "display_url": "pic.x.com/POgb2rb4xl",
+        "expanded_url": "https://x.com/SyrMOfE/status/2012552863709307173/photo/1",
+        "ext_media_availability": {
+          "status": "Available"
+        },
+        "indices": [
+          123,
+          146
+        ],
+        "media_url_https": "https://pbs.twimg.com/media/G-4FtwsWQAANxSZ.jpg",
+        "original_info": {
+          "height": 960,
+          "width": 1280,
+          "focus_rects": [
+            {
+              "x": 0,
+              "y": 122,
+              "w": 1280,
+              "h": 717
+            },
+            {
+              "x": 320,
+              "y": 0,
+              "w": 960,
+              "h": 960
+            },
+            {
+              "x": 438,
+              "y": 0,
+              "w": 842,
+              "h": 960
+            },
+            {
+              "x": 800,
+              "y": 0,
+              "w": 480,
+              "h": 960
+            },
+            {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 960
+            }
+          ]
+        },
+        "sizes": {
+          "large": {
+            "h": 960,
+            "resize": "fit",
+            "w": 1280
+          },
+          "medium": {
+            "h": 900,
+            "resize": "fit",
+            "w": 1200
+          },
+          "small": {
+            "h": 510,
+            "resize": "fit",
+            "w": 680
+          },
+          "thumb": {
+            "h": 150,
+            "resize": "crop",
+            "w": 150
+          }
+        },
+        "type": "photo",
+        "url": "https://t.co/POgb2rb4xl"
+      }
+    ],
+    "photos": [
+      {
+        "backgroundColor": {
+          "red": 204,
+          "green": 214,
+          "blue": 221
+        },
+        "cropCandidates": [
+          {
+            "x": 0,
+            "y": 58,
+            "w": 1280,
+            "h": 717
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 960,
+            "h": 960
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 842,
+            "h": 960
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 480,
+            "h": 960
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 960
+          }
+        ],
+        "expandedUrl": "https://x.com/SyrMOfE/status/2012552863709307173/photo/1",
+        "url": "https://pbs.twimg.com/media/G-4FtwpWIAMjvGf.jpg",
+        "width": 1280,
+        "height": 960
+      },
+      {
+        "backgroundColor": {
+          "red": 204,
+          "green": 214,
+          "blue": 221
+        },
+        "cropCandidates": [
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 717
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 960,
+            "h": 960
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 842,
+            "h": 960
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 480,
+            "h": 960
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 960
+          }
+        ],
+        "expandedUrl": "https://x.com/SyrMOfE/status/2012552863709307173/photo/1",
+        "url": "https://pbs.twimg.com/media/G-4Ftw3XEAA763Z.jpg",
+        "width": 1280,
+        "height": 960
+      },
+      {
+        "backgroundColor": {
+          "red": 204,
+          "green": 214,
+          "blue": 221
+        },
+        "cropCandidates": [
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 717
+          },
+          {
+            "x": 160,
+            "y": 0,
+            "w": 960,
+            "h": 960
+          },
+          {
+            "x": 219,
+            "y": 0,
+            "w": 842,
+            "h": 960
+          },
+          {
+            "x": 400,
+            "y": 0,
+            "w": 480,
+            "h": 960
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 960
+          }
+        ],
+        "expandedUrl": "https://x.com/SyrMOfE/status/2012552863709307173/photo/1",
+        "url": "https://pbs.twimg.com/media/G-4Ftw9XQAAXCW9.jpg",
+        "width": 1280,
+        "height": 960
+      },
+      {
+        "backgroundColor": {
+          "red": 204,
+          "green": 214,
+          "blue": 221
+        },
+        "cropCandidates": [
+          {
+            "x": 0,
+            "y": 122,
+            "w": 1280,
+            "h": 717
+          },
+          {
+            "x": 320,
+            "y": 0,
+            "w": 960,
+            "h": 960
+          },
+          {
+            "x": 438,
+            "y": 0,
+            "w": 842,
+            "h": 960
+          },
+          {
+            "x": 800,
+            "y": 0,
+            "w": 480,
+            "h": 960
+          },
+          {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 960
+          }
+        ],
+        "expandedUrl": "https://x.com/SyrMOfE/status/2012552863709307173/photo/1",
+        "url": "https://pbs.twimg.com/media/G-4FtwsWQAANxSZ.jpg",
+        "width": 1280,
+        "height": 960
+      }
+    ],
+    "conversation_count": 5,
+    "news_action_type": "conversation",
+    "isEdited": false,
+    "isStaleEdit": false,
+    "customSettings": null,
+    "customDuration": null
+  }
+]
