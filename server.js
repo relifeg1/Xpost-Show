@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require("socket.io");
-const clipboardy = require('clipboardy');
+const clipboardy = require('clipboardy'); // ملاحظة: النسخ لن يعمل في السيرفر السحابي
 const axios = require('axios');
 const fs = require('fs');
 
@@ -26,13 +26,14 @@ let globalSettings = {
     defaultDuration: 10
 };
 
-// تحميل البيانات
+// تحميل البيانات (إن وجدت)
 if (fs.existsSync(DB_FILE)) {
     try { queue = JSON.parse(fs.readFileSync(DB_FILE, 'utf8')); } catch (e) { queue = []; }
 }
 
 function saveDatabase() {
-    fs.writeFileSync(DB_FILE, JSON.stringify(queue, null, 2));
+    // محاولة الحفظ (في Render البيانات قد تمسح عند إعادة التشغيل وهذا طبيعي للخطة المجانية)
+    try { fs.writeFileSync(DB_FILE, JSON.stringify(queue, null, 2)); } catch (e) { console.error("Save Error", e); }
 }
 
 function updateAdmin() {
@@ -57,7 +58,7 @@ function showTweet(index) {
     if (autoState.active) {
         clearTimeout(autoState.timer);
         const duration = (tweet.customDuration || globalSettings.defaultDuration) * 1000;
-        console.log(`⏱️ Auto: Next in ${duration/1000}s`);
+        console.log(`⏱️ Auto Next in: ${duration/1000}s`);
         autoState.timer = setTimeout(() => {
             showTweet((currentIndex + 1) % queue.length);
         }, duration);
@@ -79,16 +80,21 @@ async function processAdd(url, res) {
             updateAdmin();
             return res.send ? res.send("Added") : res.json({ success: true });
         } catch (e) { 
-            return res.send ? res.send("Error Fetching") : res.status(500).json({ error: 'فشل الجلب' }); 
+            return res.send ? res.send("Error Fetching") : res.status(500).json({ error: 'فشل الجلب من المصدر' }); 
         }
     } else {
-        return res.send ? res.send("Invalid Link") : res.status(400).json({ error: 'رابط خطأ' });
+        return res.send ? res.send("Invalid Link") : res.status(400).json({ error: 'رابط غير صحيح' });
     }
 }
 
-// --- APIs العامة (للمتصفح) ---
+// --- APIs ---
+
 app.post('/api/add', async (req, res) => {
-    let url = req.body.url || await clipboardy.read().catch(() => null);
+    // محاولة استخدام الرابط المرسل، وإذا لم يوجد نحاول القراءة من السيرفر (لن يعمل في السحاب)
+    let url = req.body.url;
+    if (!url) {
+        try { url = await clipboardy.read(); } catch(e) { console.log("Clipboard not available on server"); }
+    }
     await processAdd(url, res);
 });
 
@@ -151,18 +157,21 @@ app.post('/api/settings', (req, res) => {
 });
 
 
-// 🔥🔥🔥 روابط الستريم ديك (Stream Deck Links) 🔥🔥🔥
+// 🔥 روابط Stream Deck 🔥
 
-// 1. إضافة تغريدة (من الحافظة)
+// 1. إضافة (لن تعمل في Render من الحافظة، يجب الإرسال من الأدمن)
 app.get('/trigger_add', async (req, res) => {
-    console.log("📣 Stream Deck: Add");
-    const url = await clipboardy.read().catch(() => null);
-    await processAdd(url, res);
+    try {
+        const url = await clipboardy.read(); // سيفشل في السحاب
+        await processAdd(url, res);
+    } catch (e) {
+        res.send("Server cannot read clipboard (Use Admin Panel)");
+    }
 });
 
-// 2. تشغيل / إيقاف تلقائي
+// 2. تلقائي
 app.get('/trigger_auto', (req, res) => {
-    if (queue.length === 0) return res.send("Queue Empty");
+    if (queue.length === 0) return res.send("Empty");
     autoState.active = !autoState.active;
     if (autoState.active) {
         if (currentIndex === -1) showTweet(0); else showTweet(currentIndex);
@@ -174,26 +183,27 @@ app.get('/trigger_auto', (req, res) => {
 
 // 3. التالي
 app.get('/trigger_next', (req, res) => {
-    if (queue.length === 0) return res.send("Queue Empty");
+    if (queue.length === 0) return res.send("Empty");
     showTweet((currentIndex + 1) % queue.length);
     res.send("Next");
 });
 
 // 4. السابق
 app.get('/trigger_prev', (req, res) => {
-    if (queue.length === 0) return res.send("Queue Empty");
+    if (queue.length === 0) return res.send("Empty");
     showTweet((currentIndex - 1 + queue.length) % queue.length);
     res.send("Prev");
 });
 
 // 5. إخفاء
 app.get('/hide', (req, res) => { 
-    io.emit('hide_tweet'); 
-    clearTimeout(autoState.timer); 
-    autoState.active = false; 
-    updateAdmin(); 
-    res.send('Hidden'); 
+    io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; updateAdmin(); res.send('Hidden'); 
 });
 
 io.on('connection', (s) => updateAdmin());
-server.listen(3000, () => console.log('🚀 Final System Ready on Port 3000'));
+
+// 🛑 التعديل المهم لـ Render 🛑
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+});
