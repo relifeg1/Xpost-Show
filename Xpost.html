@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ZairuDuo Tweets</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <style>
+        body {
+            margin: 0;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        #tweet-container {
+            transform: translateY(100vh) scale(0.9);
+            /* مخفي تحت */
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            max-width: 550px;
+        }
+
+        #tweet-container.visible {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="tweet-container"></div>
+
+    <script>
+        const socket = io();
+        const container = document.getElementById('tweet-container');
+
+        socket.on('show_tweet', (data) => {
+            // 1. إخفاء القديم
+            container.classList.remove('visible');
+
+            setTimeout(() => {
+                container.innerHTML = ''; // تنظيف
+
+                // 2. إنشاء الجديدة
+                twttr.widgets.createTweet(
+                    data.id,
+                    container,
+                    {
+                        theme: 'dark', // أو light
+                        align: 'center',
+                        conversation: 'none',
+                        dnt: true
+                    }
+                ).then(() => {
+                    // 3. إظهار
+                    if (container.innerHTML !== "") {
+                        container.classList.add('visible');
+                    }
+                });
+            }, 600);
+        });
+
+        socket.on('hide_tweet', () => {
+            container.classList.remove('visible');
+        });
+    </script>
+</body>
+
+</html>

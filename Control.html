@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ZairuDuo Tweet Controller</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        input { padding: 15px; width: 300px; border-radius: 8px; border: none; margin-bottom: 15px; text-align: center; font-size: 16px; }
+        button { padding: 10px 30px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 18px; margin: 5px; transition: 0.2s; }
+        .btn-show { background: #1d9bf0; color: white; }
+        .btn-hide { background: #f91880; color: white; }
+        button:hover { opacity: 0.9; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <h2>🐦 تحكم التغريدات</h2>
+    <input type="text" id="tweetUrl" placeholder="الصق رابط التغريدة هنا">
+    <div>
+        <button class="btn-show" onclick="sendTweet()">عرض التغريدة</button>
+        <button class="btn-hide" onclick="hideTweet()">إخفاء</button>
+    </div>
+    <p id="status" style="color: gray; font-size: 14px; margin-top: 20px;">جاهز...</p>
+
+    <script>
+        // نستخدم BroadcastChannel للتواصل الفوري مع صفحة الأوفرلاي
+        const channel = new BroadcastChannel('zairu_tweets');
+
+        function sendTweet() {
+            const url = document.getElementById('tweetUrl').value;
+            if (!url) return;
+            
+            // استخراج معرف التغريدة (ID) من الرابط
+            const idMatch = url.match(/status\/(\d+)/);
+            if (idMatch && idMatch[1]) {
+                channel.postMessage({ action: 'show', id: idMatch[1] });
+                document.getElementById('status').innerText = 'تم الإرسال: ' + idMatch[1];
+            } else {
+                alert('الرابط غير صحيح!');
+            }
+        }
+
+        function hideTweet() {
+            channel.postMessage({ action: 'hide' });
+            document.getElementById('status').innerText = 'تم الإخفاء';
+            document.getElementById('tweetUrl').value = '';
+        }
+    </script>
+</body>
+</html>
