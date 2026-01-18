@@ -93,7 +93,8 @@
             height: 100%;
         }
 
-        /* === Styles === */
+        /* === الثيمات === */
+
         /* 1. Classic */
         .style-classic .card {
             background: var(--bg-color);
@@ -216,7 +217,7 @@
             line-height: 1.1;
         }
 
-        /* 4. Bubble */
+        /* 4. Bubble (تم التعديل: إزالة الخلفيات) */
         .style-bubble .card {
             background: transparent;
             display: flex;
@@ -233,21 +234,28 @@
             flex-shrink: 0;
         }
 
+        /* تعديل الصورة: بدون حدود */
         .style-bubble .avatar {
-            width: 55px;
-            height: 55px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            border: 3px solid var(--bg-color);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            /* ظل للصورة */
+            border: none;
+            /* إزالة الحدود الملونة */
         }
 
+        /* تعديل الاسم: بدون خلفية */
         .style-bubble .name-badge {
-            background: var(--accent-color);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9rem;
+            background: transparent;
+            /* خلفية شفافة */
+            color: var(--accent-color);
+            /* الاسم بلون الثيم */
+            padding: 0 10px;
+            font-weight: 900;
+            font-size: 1.3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            /* ظل قوي للنص للوضوح */
         }
 
         .style-bubble .content-box {
@@ -289,12 +297,11 @@
             display: block;
         }
 
-        /* 🔥🔥🔥 قواعد البطاقة المخصصة (إخفاء النص والصورة) 🔥🔥🔥 */
+        /* 🔥 قواعد البطاقة المخصصة 🔥 */
         .type-custom .avatar,
         .type-custom .username,
         .type-custom .date,
         .type-custom .text {
-            /* هنا تم إخفاء النص */
             display: none !important;
         }
 
@@ -311,19 +318,16 @@
             color: var(--accent-color) !important;
             width: 100%;
             text-align: center;
+            background: transparent !important;
+            /* ضمان عدم وجود خلفية */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
 
-        /* تعديل خاص للفقاعة المخصصة: العنوان في المنتصف */
         .style-bubble.type-custom .name-badge {
-            font-size: 1.5rem;
-            padding: 8px 20px;
+            font-size: 1.8rem;
+            padding: 5px;
             margin: auto;
-            /* توسيط */
         }
-
-        /* إذا كان المحتوى فارغاً (فقط عنوان)، نخفي الصندوق الأبيض في الفقاعة */
-        /* .style-bubble.type-custom .content-box { display: none; } */
-        /* ^ هذا السطر اختياري: إذا كنت تريد إخفاء الصندوق الأبيض تماماً */
 
         @keyframes flashBorder {
             0% {
@@ -392,7 +396,6 @@
             }
 
             let headerHtml = '';
-            // منطق الهيدر الذكي
             if (isCustom) {
                 // مخصص: العنوان فقط
                 if (theme === 'bubble') {
@@ -401,10 +404,9 @@
                     headerHtml = `<div class="header"><div class="name">${data.user.name}</div></div>`;
                 }
             } else {
-                // عادي: حسب الإعدادات
-                // هنا الإصلاح لثيم الفقاعة: نظهر الهيدر إذا كان الاسم أو الصورة مفعلين
+                // عادي
                 if (settings.showAvatar || settings.showName) {
-                    headerHtml = `<div class="header">`;
+                    headerHtml += `<div class="header">`;
                     if (settings.showAvatar) headerHtml += `<img class="avatar" src="${data.user.profile_image_url_https.replace('_normal', '')}">`;
                     headerHtml += `<div class="user-info">`;
                     if (settings.showName) headerHtml += `<div class="name">${data.user.name}</div>`;
