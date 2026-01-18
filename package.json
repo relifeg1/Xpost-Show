@@ -1,14 +1,13 @@
 {
   "name": "zairu-tweet-system",
   "version": "1.0.0",
-  "description": "Tweet Overlay System for Streaming",
+  "description": "Tweet Overlay System",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "axios": "^1.6.0",
-    "clipboardy": "^2.3.0",
     "express": "^4.18.2",
     "socket.io": "^4.7.2"
   },
