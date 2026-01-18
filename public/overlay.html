@@ -8,13 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
         :root {
-            /* Variables controlled by JS */
+            /* القيم الافتراضية */
             --global-scale: 1.0;
             --card-width: 500px;
             --card-height: auto;
             --card-overflow: visible;
 
-            /* Default Dark Mode */
+            /* الألوان */
             --bg-color: #000000;
             --text-color: #ffffff;
             --sub-text: #888888;
@@ -50,18 +50,21 @@
             font-family: 'Cairo', sans-serif;
         }
 
+        /* 🔥 الحاوية الرئيسية: هي التي تتحكم بالحجم والزوم 🔥 */
         #container {
             display: none;
             position: absolute;
             bottom: 50px;
             right: 50px;
 
-            /* Apply Geometry */
-            width: var(--card-width);
-            height: var(--card-height);
+            /* تطبيق المتغيرات بصرامة */
+            width: var(--card-width) !important;
+            height: var(--card-height) !important;
             transform: scale(var(--global-scale));
             transform-origin: bottom right;
-            transition: all 0.3s ease;
+            /* التكبير يبدأ من الزاوية */
+
+            transition: width 0.3s ease, height 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .media img,
@@ -92,7 +95,17 @@
             background: var(--accent-color);
         }
 
-        /* === Theme 1: Classic === */
+        /* === توحيد الخصائص لكل الثيمات لتستجيب للأبعاد === */
+        .card,
+        .content-box {
+            box-sizing: border-box;
+            /* مهم جداً لعدم تجاوز الحدود */
+            width: 100%;
+            height: 100%;
+            /* لملء الحاوية في حال تحديد الارتفاع */
+        }
+
+        /* 1. Classic */
         .style-classic .card {
             background: var(--bg-color);
             color: var(--text-color);
@@ -100,9 +113,7 @@
             padding: 20px;
             box-shadow: var(--card-shadow);
             border: 1px solid var(--border-color);
-            height: 100%;
-            box-sizing: border-box;
-            position: relative;
+            overflow: var(--card-overflow);
         }
 
         .style-classic .header {
@@ -117,12 +128,6 @@
             height: 48px;
             border-radius: 50%;
             object-fit: cover;
-        }
-
-        .style-classic .user-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
 
         .style-classic .name {
@@ -144,7 +149,7 @@
             margin-top: 5px;
         }
 
-        /* === Theme 2: Minimal (Glass) === */
+        /* 2. Minimal */
         .style-minimal .card {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
@@ -153,8 +158,7 @@
             padding: 15px 20px;
             border-right: 5px solid var(--accent-color);
             box-shadow: var(--card-shadow);
-            height: 100%;
-            box-sizing: border-box;
+            overflow: var(--card-overflow);
         }
 
         .style-minimal .header {
@@ -178,23 +182,13 @@
             color: var(--text-color);
         }
 
-        .style-minimal .username {
-            color: var(--sub-text);
-            font-size: 0.85rem;
-            margin-right: 5px;
-        }
-
         .style-minimal .text {
             font-size: 1.4rem;
             font-weight: 600;
             line-height: 1.3;
         }
 
-        .style-minimal #progress-bar-container {
-            border-radius: 0 0 12px 12px;
-        }
-
-        /* === Theme 3: Chunky === */
+        /* 3. Chunky */
         .style-chunky .card {
             background: #000;
             border: 4px solid var(--accent-color);
@@ -202,8 +196,7 @@
             padding: 25px;
             color: #fff;
             box-shadow: 0 10px 0 rgba(0, 0, 0, 1);
-            height: 100%;
-            box-sizing: border-box;
+            overflow: var(--card-overflow);
         }
 
         .style-chunky .header {
@@ -234,9 +227,11 @@
             line-height: 1.1;
         }
 
-        /* === Theme 4: Bubble === */
+        /* 4. Bubble */
         .style-bubble .card {
             background: transparent;
+            display: flex;
+            flex-direction: column;
         }
 
         .style-bubble .header {
@@ -246,6 +241,7 @@
             margin-bottom: -15px;
             position: relative;
             z-index: 2;
+            flex-shrink: 0;
         }
 
         .style-bubble .avatar {
@@ -276,8 +272,9 @@
             font-size: 1.3rem;
             margin-top: 5px;
             border: 1px solid var(--border-color);
-            height: 100%;
-            box-sizing: border-box;
+            flex-grow: 1;
+            /* لتعبئة المساحة المتبقية */
+            overflow: var(--card-overflow);
         }
 
         .breaking-mode .card {
@@ -331,16 +328,20 @@
         const container = document.getElementById('container');
         const audio = document.getElementById('notifSound');
 
-        function renderTweet(data, settings, isBreaking, isPinned) {
-            const theme = settings.theme || 'classic';
+        // 🔥 دالة منفصلة لتطبيق الأبعاد فوراً 🔥
+        function applyGeometry(settings) {
+            const scale = settings.scale || 1.0;
+            const width = settings.cardWidth || 500;
+            const useAutoHeight = settings.useAutoHeight ?? true;
+            const height = settings.cardHeight || 400;
             const colorMode = settings.colorMode || 'dark';
 
-            // Apply Size & Mode
-            document.documentElement.style.setProperty('--global-scale', settings.scale || 1.0);
-            document.documentElement.style.setProperty('--card-width', (settings.cardWidth || 500) + 'px');
+            // CSS Variables Update
+            document.documentElement.style.setProperty('--global-scale', scale);
+            document.documentElement.style.setProperty('--card-width', width + 'px');
 
-            if (settings.useAutoHeight === false) {
-                document.documentElement.style.setProperty('--card-height', settings.cardHeight + 'px');
+            if (!useAutoHeight) {
+                document.documentElement.style.setProperty('--card-height', height + 'px');
                 document.documentElement.style.setProperty('--card-overflow', 'hidden');
             } else {
                 document.documentElement.style.setProperty('--card-height', 'auto');
@@ -348,6 +349,21 @@
             }
 
             document.body.className = `mode-${colorMode}`;
+        }
+
+        // استقبال التحديثات اللحظية من لوحة التحكم
+        socket.on('state_update', (state) => {
+            if (state.settings) {
+                applyGeometry(state.settings);
+            }
+        });
+
+        function renderTweet(data, settings, isBreaking, isPinned) {
+            const theme = settings.theme || 'classic';
+
+            // نطبق الأبعاد أيضاً عند الرسم
+            applyGeometry(settings);
+
             container.className = `style-${theme} ${isBreaking ? 'breaking-mode' : ''}`;
 
             const formattedText = data.text.replace(/(https?:\/\/[^\s]+)/g, '');

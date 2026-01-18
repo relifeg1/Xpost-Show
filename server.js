@@ -18,12 +18,12 @@ let queue = [];
 let currentIndex = -1;
 let autoState = { active: false, timer: null };
 
-// الإعدادات العامة (تم توسيعها)
+// الإعدادات العامة (تم إضافة إعدادات الأبعاد هنا)
 let globalSettings = { 
     theme: 'classic', 
     colorMode: 'dark', // light, dark, dim
     
-    // إعدادات الأبعاد الجديدة
+    // 🔥 الإعدادات الجديدة للأبعاد 🔥
     scale: 1.0,
     cardWidth: 500,
     cardHeight: 400,
@@ -38,6 +38,7 @@ async function loadDatabase() {
         const res = await axios.get(API_URL);
         if (res.data) {
             queue = res.data.queue || [];
+            // دمج الإعدادات للتأكد من وجود القيم الجديدة
             globalSettings = { ...globalSettings, ...res.data.settings };
             updateAdmin();
         }

@@ -26,7 +26,6 @@
         .btn-control { background: #333; border: 1px solid #555; }
         .btn-active-auto { background: #00ba7c; color: white; animation: pulse 2s infinite; }
         
-        /* 🔥 تصميم البطاقة بحجم ثابت (Fixed Height) 🔥 */
         .queue-card { 
             background: #1e1e1e; border: 1px solid #333; border-right: 4px solid #444; 
             border-radius: 8px; margin-bottom: 8px; height: 125px; 
@@ -41,7 +40,6 @@
         .card-index { font-weight: bold; font-size: 12px; color: #666; width: 25px; }
         .card-title { font-weight: bold; font-size: 13px; color: #fff; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* قص النص الزائد */
         .card-body { padding: 8px 10px; font-size: 13px; color: #ccc; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
         
         .card-actions { display: flex; gap: 2px; padding: 5px; background: rgba(0,0,0,0.1); height: 38px; box-sizing: border-box; }
@@ -55,12 +53,9 @@
         .preview-container { width: 100%; height: 180px; overflow: hidden; position: relative; background: #000; border-radius: 8px; border: 2px solid #333; }
         iframe { width: 1280px; height: 720px; border: none; transform: scale(0.25); transform-origin: top left; pointer-events: none; }
 
-        /* Edit Modal */
         #editModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
         #editModalContent { background: #1f1f1f; padding: 25px; border-radius: 12px; width: 450px; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -112,19 +107,19 @@
         </div>
         
         <div class="box" style="border-left: 3px solid #e6b800;">
-            <h4 class="section-title">📏 الأبعاد</h4>
+            <h4 class="section-title">📏 الأبعاد والزوم</h4>
             <div style="margin-bottom: 5px;">
                 <label style="font-size:12px; color:#aaa;">🔍 زوم: <span id="valScale">1.0</span>x</label>
-                <input type="range" id="scale" min="0.5" max="2.0" step="0.1" value="1.0" oninput="document.getElementById('valScale').innerText = this.value; updateSettings()">
+                <input type="range" id="scale" min="0.5" max="3.0" step="0.1" value="1.0" oninput="document.getElementById('valScale').innerText = this.value; updateSettings()">
             </div>
             <div style="margin-bottom: 5px;">
                 <label style="font-size:12px; color:#aaa;">↔️ عرض: <span id="valWidth">500</span>px</label>
-                <input type="range" id="cardWidth" min="300" max="1000" step="10" value="500" oninput="document.getElementById('valWidth').innerText = this.value; updateSettings()">
+                <input type="range" id="cardWidth" min="300" max="1200" step="10" value="500" oninput="document.getElementById('valWidth').innerText = this.value; updateSettings()">
             </div>
             <div>
                 <label style="font-size:12px;"><input type="checkbox" id="useAutoHeight" checked onchange="toggleHeightControl(); updateSettings()" style="width:auto;"> ارتفاع تلقائي</label>
                 <div id="heightControl" style="display:none; margin-top:5px;">
-                    <input type="range" id="cardHeight" min="100" max="800" step="10" value="400" oninput="document.getElementById('valHeight').innerText = this.value + 'px'; updateSettings()">
+                    <input type="range" id="cardHeight" min="100" max="1000" step="10" value="400" oninput="document.getElementById('valHeight').innerText = this.value + 'px'; updateSettings()">
                     <span id="valHeight" style="font-size:11px; color:#666;">400px</span>
                 </div>
             </div>
@@ -224,7 +219,7 @@
             document.getElementById('playSound').checked = state.settings.playSound;
             document.getElementById('globalTimer').value = state.settings.defaultDuration || 15;
 
-            // Dimensions
+            // Dimensions update
             document.getElementById('scale').value = state.settings.scale || 1.0;
             document.getElementById('valScale').innerText = state.settings.scale || 1.0;
             document.getElementById('cardWidth').value = state.settings.cardWidth || 500;
@@ -344,6 +339,8 @@
                 showDate: document.getElementById('showDate').checked,
                 playSound: document.getElementById('playSound').checked,
                 defaultDuration: parseInt(document.getElementById('globalTimer').value) || 15,
+                
+                // New Dimensions Settings
                 scale: parseFloat(document.getElementById('scale').value),
                 cardWidth: parseInt(document.getElementById('cardWidth').value),
                 useAutoHeight: document.getElementById('useAutoHeight').checked,
