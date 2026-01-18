@@ -1,483 +1,216 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
-
-<head>
-    <meta charset="UTF-8">
-    <title>تحكم ZairuDuo</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZairuDuo Controller 🎮</title>
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: #121212;
-            color: white;
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            gap: 15px;
-            height: 100vh;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
+      body {
+        background: #121212;
+        color: white;
+        font-family: "Segoe UI", sans-serif;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+      }
+      input,
+      button,
+      select {
+        width: 100%;
+        padding: 12px;
+        margin: 5px 0;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+      }
+      input {
+        background: #333;
+        color: white;
+      }
+      button {
+        cursor: pointer;
+        font-weight: bold;
+      }
+      .btn-add {
+        background: #1d9bf0;
+        color: white;
+      }
+      .btn-control {
+        background: #00ba7c;
+        color: white;
+        width: 48%;
+        display: inline-block;
+      }
+      .btn-hide {
+        background: #f91880;
+        color: white;
+      }
+      .tweet-item {
+        background: #1e1e1e;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .status-bar {
+        background: #2f3336;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
 
-        .column {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .queue-col {
-            flex: 2;
-        }
-
-        .settings-col {
-            flex: 1;
-            min-width: 320px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .panel {
-            background: #1e1e1e;
-            border-radius: 12px;
-            padding: 15px;
-            border: 1px solid #333;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel-full {
-            flex: 1;
-            min-height: 0;
-        }
-
-        /* القائمة */
-        .queue-list {
-            overflow-y: auto;
-            flex: 1;
-            margin-top: 10px;
-            padding-left: 5px;
-        }
-
-        .tweet-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #252525;
-            padding: 8px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            height: 55px;
-            flex-shrink: 0;
-            border: 1px solid #333;
-            position: relative;
-        }
-
-        .tweet-item.active {
-            border: 2px solid #1d9bf0;
-            background: #15202b;
-        }
-
-        /* علامة التخصيص */
-        .custom-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #f91880;
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 6px;
-            border-radius: 10px;
-            display: none;
-        }
-
-        .tweet-item.has-custom .custom-badge {
-            display: block;
-        }
-
-        .t-img {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-        }
-
-        .t-content {
-            flex: 1;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .t-text {
-            font-size: 0.8rem;
-            color: #aaa;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* الأزرار */
-        button {
-            border: none;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-family: 'Cairo';
-            transition: 0.2s;
-        }
-
-        .btn-blue {
-            background: #1d9bf0;
-            color: white;
-        }
-
-        .btn-green {
-            background: #00ba7c;
-            color: white;
-        }
-
-        .btn-red {
-            background: #f91880;
-            color: white;
-        }
-
-        .btn-dark {
-            background: #333;
-            color: white;
-        }
-
-        .btn-icon {
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* حالة الزر الأوتوماتيكي */
-        .auto-active {
-            background: #00ffaa !important;
-            color: black !important;
-            box-shadow: 0 0 15px rgba(0, 255, 170, 0.4);
-        }
-
-        /* السويتش */
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 36px;
-            height: 20px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #555;
-            transition: .4s;
-            border-radius: 20px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked+.slider {
-            background-color: #1d9bf0;
-        }
-
-        input:checked+.slider:before {
-            transform: translateX(16px);
-        }
-
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            background: #222;
-            border: 1px solid #444;
-            color: white;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        /* النافذة المنبثقة للتعديل */
-        #editModal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 100;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 12px;
-            width: 350px;
-            border: 1px solid #555;
-        }
+      /* تنسيق قائمة الثيمات */
+      select {
+        background: #444;
+        color: #fff;
+        border: 2px solid #555;
+        cursor: pointer;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+        color: #aaa;
+        font-size: 14px;
+      }
     </style>
-</head>
+  </head>
+  <body>
+    <div class="container">
+      <h2>🎛️ لوحة تحكم ZairuDuo</h2>
 
-<body>
+      <div class="status-bar">
+        <span id="statusText">جارِ الاتصال...</span>
+        <div
+          id="currentThemeDisplay"
+          style="font-size: 12px; color: #1d9bf0; margin-top: 5px"
+        ></div>
+      </div>
 
-    <div id="editModal">
-        <div class="modal-content">
-            <h3 style="margin-top:0">✏️ تخصيص التغريدة</h3>
-            <p style="font-size:0.8rem; color:#888;">هذه الإعدادات ستطبق على هذه التغريدة فقط.</p>
+      <div
+        style="
+          background: #191919;
+          padding: 15px;
+          border-radius: 10px;
+          margin-bottom: 15px;
+          border: 1px solid #333;
+        "
+      >
+        <label>🎨 اختر تصميم التغريدة:</label>
+        <select id="themeSelector" onchange="updateSettings()">
+          <option value="classic">كلاسيك (تويتر الرسمي)</option>
+          <option value="chunky">الضخم (للشاشات الصغيرة) 🔥</option>
+          <option value="bubble">الفقاعة (Bubble)</option>
+          <option value="minimal">مينيمال (شفاف وبسيط)</option>
+        </select>
+      </div>
 
-            <div class="setting-row">
-                <span>وقت خاص (ثواني)</span>
-                <input type="number" id="editDuration" placeholder="اتركه فارغاً للوقت العام" style="width: 80px;">
-            </div>
-            <hr style="border-color:#333">
-            <div class="setting-row">
-                <span>صورة العرض</span>
-                <label class="switch"><input type="checkbox" id="editAvatar"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <span>الاسم</span>
-                <label class="switch"><input type="checkbox" id="editName"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <span>الميديا</span>
-                <label class="switch"><input type="checkbox" id="editMedia"><span class="slider"></span></label>
-            </div>
+      <input
+        type="text"
+        id="tweetUrl"
+        placeholder="الصق رابط التغريدة هنا..."
+      />
+      <button class="btn-add" onclick="addTweet()">إضافة للقائمة ➕</button>
 
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button class="btn-green" style="width:100%" onclick="saveEdit()">حفظ التخصيص</button>
-                <button class="btn-red" style="width:100%" onclick="resetEdit()">إلغاء التخصيص</button>
-            </div>
-            <button class="btn-dark" style="width:100%; margin-top:10px" onclick="closeModal()">إغلاق</button>
-        </div>
+      <div style="margin-top: 15px">
+        <button class="btn-control" onclick="control('prev')">⏮️ السابق</button>
+        <button class="btn-control" onclick="control('next')">التالي ⏭️</button>
+      </div>
+      <button
+        class="btn-control"
+        style="width: 100%; margin-top: 5px; background: #e6b800"
+        onclick="control('toggle_auto')"
+      >
+        تشغيل تلقائي ⏯️
+      </button>
+      <button
+        class="btn-hide"
+        style="width: 100%; margin-top: 5px"
+        onclick="control('hide')"
+      >
+        إخفاء التغريدة 👁️
+      </button>
+
+      <h3>القائمة الحالية (<span id="count">0</span>)</h3>
+      <div id="queueList"></div>
     </div>
 
-    <div class="column queue-col">
-        <div class="panel panel-full">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3 style="margin:0;">📜 القائمة (<span id="count">0</span>)</h3>
-                <div style="display:flex; gap:5px">
-                    <button class="btn-dark" onclick="api('control', {action:'toggle_auto'})" id="btnAutoMain">⏯️ تشغيل
-                        آلي</button>
-                    <button class="btn-red" onclick="api('manage', {action:'clear'})">مسح الكل</button>
-                </div>
-            </div>
-            <div class="queue-list" id="queueList"></div>
-        </div>
-    </div>
-
-    <div class="column settings-col">
-        <div class="panel">
-            <h4>➕ إضافة سريعة</h4>
-            <div style="display:flex; gap:5px">
-                <input type="text" id="urlInput" placeholder="رابط التغريدة..." style="margin:0">
-                <button class="btn-blue" style="width:auto" onclick="addTweet()">+</button>
-            </div>
-            <button class="btn-dark" style="margin-top:5px" onclick="addFromClipboard()">لصق من الحافظة</button>
-        </div>
-
-        <div class="panel">
-            <h4>🌍 الإعدادات العامة (الافتراضية)</h4>
-            <div class="setting-row">
-                <span>⏱️ الوقت الافتراضي (ثواني)</span>
-                <input type="number" id="defaultDuration" style="width:60px; text-align:center" onchange="saveGlobal()">
-            </div>
-            <hr style="border-color:#333; width:100%">
-
-            <div class="setting-row">
-                <span>الصورة</span> <label class="switch"><input type="checkbox" id="showAvatar"
-                        onchange="saveGlobal()"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <span>الاسم</span> <label class="switch"><input type="checkbox" id="showName"
-                        onchange="saveGlobal()"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <span>الميديا</span> <label class="switch"><input type="checkbox" id="showMedia"
-                        onchange="saveGlobal()"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <span>الأرقام</span> <label class="switch"><input type="checkbox" id="showStats"
-                        onchange="saveGlobal()"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <span>التاريخ</span> <label class="switch"><input type="checkbox" id="showDate"
-                        onchange="saveGlobal()"><span class="slider"></span></label>
-            </div>
-
-            <div class="setting-row" style="margin-top:10px">
-                <span>🔍 الحجم</span>
-                <input type="range" id="scale" min="0.5" max="1.5" step="0.1" style="width:100px"
-                    oninput="saveGlobal()">
-            </div>
-        </div>
-
-        <div class="panel">
-            <button class="btn-red" onclick="fetch('/hide')">إخفاء نهائي 👁️‍🗨️</button>
-        </div>
-    </div>
-
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        let currentQueue = [];
-        let editIndex = -1;
+      const socket = io();
+      let currentSettings = {};
 
-        // تحديث الحالة الشامل
-        socket.on('state_update', (data) => {
-            currentQueue = data.queue;
-            renderQueue(data);
-            renderSettings(data.settings);
+      socket.on("state_update", (state) => {
+        document.getElementById("count").innerText = state.queue.length;
+        document.getElementById("statusText").innerText = state.isAuto
+          ? "✅ الوضع التلقائي يعمل"
+          : "⏸️ الوضع اليدوي";
 
-            // تحديث زر الأوتوماتيك
-            const btn = document.getElementById('btnAutoMain');
-            if (data.isAuto) {
-                btn.innerText = "⏹️ إيقاف الآلي";
-                btn.classList.add('auto-active');
-            } else {
-                btn.innerText = "⏯️ تشغيل آلي";
-                btn.classList.remove('auto-active');
-            }
-        });
-
-        function renderQueue(data) {
-            const list = document.getElementById('queueList');
-            document.getElementById('count').innerText = data.queue.length;
-            list.innerHTML = '';
-
-            data.queue.forEach((t, i) => {
-                const isCustom = t.customSettings || t.customDuration;
-                const div = document.createElement('div');
-                div.className = `tweet-item ${i === data.current ? 'active' : ''} ${isCustom ? 'has-custom' : ''}`;
-
-                div.innerHTML = `
-                    <div class="custom-badge">مخصص</div>
-                    <img src="${t.user.profile_image_url_https}" class="t-img">
-                    <div class="t-content">
-                        <div style="font-weight:bold; font-size:0.85rem">${t.user.name}</div>
-                        <div class="t-text">${t.text}</div>
+        // تحديث القائمة
+        const list = document.getElementById("queueList");
+        list.innerHTML = "";
+        state.queue.forEach((t, i) => {
+          const div = document.createElement("div");
+          div.className = "tweet-item";
+          div.style.border = i === state.current ? "2px solid #1d9bf0" : "none";
+          div.innerHTML = `
+                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%;">
+                        ${i + 1}. ${t.text || "صورة/فيديو"}
                     </div>
-                    <div style="display:flex; gap:5px;">
-                        <button onclick="api('control', {action:'show', index:${i}})" class="btn-blue btn-icon" title="عرض">▶️</button>
-                        <button onclick="openEdit(${i})" class="btn-dark btn-icon" title="تخصيص">⚙️</button>
-                        <button onclick="api('manage', {action:'move_up', index:${i}})" class="btn-dark btn-icon">⬆️</button>
-                        <button onclick="api('manage', {action:'move_down', index:${i}})" class="btn-dark btn-icon">⬇️</button>
-                        <button onclick="api('manage', {action:'delete', index:${i}})" class="btn-red btn-icon">✖️</button>
+                    <div>
+                        <button onclick="control('show', ${i})" style="width:auto; padding:5px 10px;">▶️</button>
+                        <button onclick="manage('delete', ${i})" style="width:auto; padding:5px 10px; background:#f00;">🗑️</button>
                     </div>
                 `;
-                list.appendChild(div);
-            });
+          list.appendChild(div);
+        });
+
+        // تحديث اختيار الثيم في القائمة
+        if (state.settings && state.settings.theme) {
+          currentSettings = state.settings;
+          document.getElementById("themeSelector").value = state.settings.theme;
+          document.getElementById("currentThemeDisplay").innerText =
+            `الثيم الحالي: ${state.settings.theme}`;
         }
+      });
 
-        function renderSettings(s) {
-            document.getElementById('showAvatar').checked = s.showAvatar;
-            document.getElementById('showName').checked = s.showName;
-            document.getElementById('showMedia').checked = s.showMedia;
-            document.getElementById('showStats').checked = s.showStats;
-            document.getElementById('showDate').checked = s.showDate;
-            document.getElementById('defaultDuration').value = s.defaultDuration;
-            document.getElementById('scale').value = s.scale;
-        }
+      function addTweet() {
+        const url = document.getElementById("tweetUrl").value;
+        fetch("/api/add", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        }).then(() => (document.getElementById("tweetUrl").value = ""));
+      }
 
-        // --- منطق التخصيص ---
-        function openEdit(index) {
-            editIndex = index;
-            const t = currentQueue[index];
-            const modal = document.getElementById('editModal');
+      function control(action, index) {
+        fetch("/api/control", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action, index }),
+        });
+      }
 
-            // تعبئة البيانات الموجودة أو الافتراضية
-            const settings = t.customSettings || {}; // إذا لا يوجد، كائن فارغ (سيأخذ قيم من UI لاحقاً)
+      function manage(action, index) {
+        fetch("/api/manage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action, index }),
+        });
+      }
 
-            // ملاحظة: هنا سنفترض تفعيل الأزرار إذا لم يكن هناك تخصيص، أو حسب التخصيص
-            // الأفضل: عرض القيم الحالية للتخصيص
-            document.getElementById('editDuration').value = t.customDuration || '';
-            document.getElementById('editAvatar').checked = (t.customSettings ? t.customSettings.showAvatar : true);
-            document.getElementById('editName').checked = (t.customSettings ? t.customSettings.showName : true);
-            document.getElementById('editMedia').checked = (t.customSettings ? t.customSettings.showMedia : true);
-
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() { document.getElementById('editModal').style.display = 'none'; }
-
-        async function saveEdit() {
-            const customSettings = {
-                showAvatar: document.getElementById('editAvatar').checked,
-                showName: document.getElementById('editName').checked,
-                showMedia: document.getElementById('editMedia').checked,
-                // بقية القيم نتركها true افتراضياً إذا لم نعدلها
-                showStats: true, showDate: true, scale: parseFloat(document.getElementById('scale').value)
-            };
-            const customDuration = document.getElementById('editDuration').value ? parseInt(document.getElementById('editDuration').value) : null;
-
-            await api('edit_tweet', { index: editIndex, customSettings, customDuration });
-            closeModal();
-        }
-
-        async function resetEdit() {
-            await api('edit_tweet', { index: editIndex, customSettings: null, customDuration: null });
-            closeModal();
-        }
-
-        // --- APIs ---
-        async function api(endpoint, body) {
-            await fetch(`/api/${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-        }
-
-        async function saveGlobal() {
-            const settings = {
-                showAvatar: document.getElementById('showAvatar').checked,
-                showName: document.getElementById('showName').checked,
-                showMedia: document.getElementById('showMedia').checked,
-                showStats: document.getElementById('showStats').checked,
-                showDate: document.getElementById('showDate').checked,
-                defaultDuration: parseInt(document.getElementById('defaultDuration').value),
-                scale: parseFloat(document.getElementById('scale').value)
-            };
-            await api('settings', settings);
-        }
-
-        async function addTweet() {
-            const url = document.getElementById('urlInput').value;
-            if (url) { await api('add', { url }); document.getElementById('urlInput').value = ''; }
-        }
-        async function addFromClipboard() { await api('add', {}); }
+      function updateSettings() {
+        const theme = document.getElementById("themeSelector").value;
+        fetch("/api/settings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ theme }),
+        });
+      }
     </script>
-</body>
-
+  </body>
 </html>
