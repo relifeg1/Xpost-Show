@@ -26,33 +26,59 @@
         .btn-control { background: #333; border: 1px solid #555; }
         .btn-active-auto { background: #00ba7c; color: white; animation: pulse 2s infinite; }
         
-        /* تصميم القائمة المضغوط */
-        .tweet-item { background: #1e1e1e; padding: 8px; margin-bottom: 6px; border-radius: 6px; border-right: 4px solid #333; transition: all 0.3s; font-size: 13px; }
-        .tweet-item.active { border-right-color: #1d9bf0; background: #252a30; }
-        .tweet-item.pinned { border-right-color: #e6b800; }
-        .tweet-item.breaking { border-right-color: #f91880; background: rgba(249, 24, 128, 0.1); }
+        /* 🔥 تصميم بطاقة القائمة الجديد 🔥 */
+        .queue-card { 
+            background: #1e1e1e; 
+            border: 1px solid #333;
+            border-right: 4px solid #444; 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            display: flex; 
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .queue-card.active { border-right-color: #1d9bf0; background: #222b33; border-color: #1d9bf0; box-shadow: 0 0 10px rgba(29, 155, 240, 0.1); }
+        .queue-card.pinned { border-right-color: #e6b800; }
+        .queue-card.breaking { border-right-color: #f91880; }
 
-        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; color: #888; font-size: 11px; }
-        
-        /* 🔥 تقليص النص الطويل ليأخذ مساحة صغيرة 🔥 */
-        .item-content { 
+        /* الصف العلوي: ترتيب + عنوان + أدوات */
+        .card-top { 
+            display: flex; align-items: center; justify-content: space-between; 
+            background: rgba(0,0,0,0.2); padding: 6px 10px; border-bottom: 1px solid #333;
+        }
+        .card-index { font-weight: bold; font-size: 12px; color: #666; width: 25px; }
+        .card-title { font-weight: bold; font-size: 13px; color: #fff; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-badges { font-size: 12px; margin-right: 5px; }
+
+        /* الصف الأوسط: المحتوى النصي */
+        .card-body { 
+            padding: 8px 10px; 
+            font-size: 13px; 
+            color: #ccc; 
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis; 
-            max-width: 100%; 
-            color: #ddd; 
-            font-weight: 500;
-            margin-bottom: 6px;
         }
 
-        .controls-row { display: flex; gap: 4px; }
-        .mini-btn { padding: 4px 8px; font-size: 11px; width: auto; flex: 0; }
-        .play-btn { flex: 1; background: #1d9bf0; color: white; }
+        /* الصف السفلي: الأزرار */
+        .card-actions { 
+            display: flex; gap: 2px; padding: 5px; background: rgba(0,0,0,0.1); 
+        }
+        .action-btn { 
+            flex: 1; padding: 6px 0; font-size: 14px; border-radius: 4px; background: #2a2a2a; color: #aaa; 
+            display: flex; justify-content: center; align-items: center;
+        }
+        .action-btn:hover { background: #3a3a3a; color: white; }
+        .btn-play { background: #1d9bf0; color: white; flex: 2; }
+        .btn-play:hover { background: #1a8cd8; }
+        .btn-delete { background: #3a1111; color: #ff6666; }
+        .btn-delete:hover { background: #5a1111; }
 
         .preview-container { width: 100%; height: 168px; overflow: hidden; position: relative; background: #000; border-radius: 8px; border: 2px solid #333; }
         iframe { width: 1280px; height: 720px; border: none; transform: scale(0.234); transform-origin: top left; pointer-events: none; }
 
-        /* نافذة التعديل المنبثقة */
+        /* نافذة التعديل */
         #editModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
         #editModalContent { background: #222; padding: 20px; border-radius: 10px; width: 400px; border: 1px solid #444; }
 
@@ -80,10 +106,10 @@
                 <input type="text" id="tweetUrl" placeholder="https://x.com/..." autofocus>
             </div>
             <div id="tab-custom" class="tab-content">
-                <input type="text" id="customTitle" placeholder="العنوان">
-                <textarea id="customText" rows="2" placeholder="النص..."></textarea>
-                <input type="text" id="customImage" placeholder="صورة (اختياري)">
-                <input type="text" id="customMedia" placeholder="ميديا (اختياري)">
+                <input type="text" id="customTitle" placeholder="العنوان (اسم الحساب)">
+                <textarea id="customText" rows="2" placeholder="محتوى الخبر..."></textarea>
+                <input type="text" id="customImage" placeholder="صورة شخصية (اختياري)">
+                <input type="text" id="customMedia" placeholder="صورة الخبر/ميديا (اختياري)">
             </div>
             <div style="display:flex; gap:5px; margin-top:5px;">
                 <select id="addTheme" style="flex:1;">
@@ -97,19 +123,17 @@
             <button class="btn-add" onclick="addItem()">إضافة ➕</button>
         </div>
 
-        <h3 class="section-title">القائمة (<span id="count">0</span>)</h3>
+        <h3 class="section-title">قائمة المتابعة (<span id="count">0</span>)</h3>
         <div id="queueList"></div>
     </div>
 
     <div>
         <div class="box">
-            <h4 class="section-title">👁️ Live</h4>
-            <div class="preview-container">
-                <iframe src="/overlay.html" scrolling="no"></iframe>
-            </div>
+            <h4 class="section-title">👁️ Live Preview</h4>
+            <div class="preview-container"><iframe src="/overlay.html" scrolling="no"></iframe></div>
         </div>
         <div class="box">
-            <h4 class="section-title">🎮 تحكم</h4>
+            <h4 class="section-title">🎮 تحكم بالبث</h4>
             <div style="display:flex; gap:5px;">
                 <button class="btn-control" onclick="api('control', {action:'prev'})">⏮️</button>
                 <button class="btn-control" onclick="api('control', {action:'next'})">⏭️</button>
@@ -118,7 +142,7 @@
             <button class="btn-control" style="width:100%; margin-top:5px; background:#f91880; color:white;" onclick="api('control', {action:'hide'})">إخفاء ⏹️</button>
         </div>
         <div class="box">
-            <h4 class="section-title">⚙️ إظهار</h4>
+            <h4 class="section-title">⚙️ ظهور العناصر</h4>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
                 <label><input type="checkbox" id="showAvatar" onchange="updateSettings()" style="width:auto;"> صورة</label>
                 <label><input type="checkbox" id="showName" onchange="updateSettings()" style="width:auto;"> اسم</label>
@@ -131,12 +155,10 @@
 
 <div id="editModal">
     <div id="editModalContent">
-        <h3 style="margin-top:0;">تعديل المحتوى</h3>
+        <h3 style="margin-top:0;">تعديل الخبر</h3>
         <input type="hidden" id="editIndex">
-        <label>العنوان (الاسم):</label>
-        <input type="text" id="editTitle">
-        <label>النص:</label>
-        <textarea id="editText" rows="4"></textarea>
+        <label>العنوان:</label><input type="text" id="editTitle">
+        <label>النص:</label><textarea id="editText" rows="4"></textarea>
         <div style="display:flex; gap:10px; margin-top:10px;">
             <button onclick="saveEdit()" style="background:#1d9bf0;">حفظ</button>
             <button onclick="closeEdit()" style="background:#555;">إلغاء</button>
@@ -158,10 +180,10 @@
     }
 
     socket.on('state_update', (state) => {
+        // تحديث الواجهة العامة
         document.getElementById('count').innerText = state.queue.length;
         document.getElementById('statusText').innerText = state.isAuto ? "Auto" : "Manual";
         document.getElementById('statusIcon').innerText = state.isAuto ? "🟢" : "⏸️";
-        
         const btnAuto = document.getElementById('btnAuto');
         if(state.isAuto) btnAuto.classList.add('btn-active-auto'); else btnAuto.classList.remove('btn-active-auto');
 
@@ -174,6 +196,7 @@
             document.getElementById('globalTimer').value = state.settings.defaultDuration || 15;
         }
 
+        // بناء قائمة البطاقات
         const list = document.getElementById('queueList');
         list.innerHTML = '';
         state.queue.forEach((t, i) => {
@@ -181,24 +204,32 @@
             const isPinned = t.customSettings?.pinned;
             const isBreaking = t.customSettings?.breaking;
             
-            div.className = `tweet-item ${i === state.current ? 'active' : ''} ${isPinned ? 'pinned' : ''} ${isBreaking ? 'breaking' : ''}`;
+            div.className = `queue-card ${i === state.current ? 'active' : ''} ${isPinned ? 'pinned' : ''} ${isBreaking ? 'breaking' : ''}`;
             
-            // هنا نستخدم name أو custom title
             const displayTitle = t.user.name;
             const displayText = t.text || 'ميديا';
 
             div.innerHTML = `
-                <div class="item-header">
-                    <span>#${i+1} • ${displayTitle}</span>
-                    <span>${isPinned ? '📌' : ''} ${isBreaking ? '🚨' : ''}</span>
+                <div class="card-top">
+                    <span class="card-index">#${i+1}</span>
+                    <span class="card-title">${displayTitle}</span>
+                    <span class="card-badges">
+                        ${isPinned ? '📌' : ''} ${isBreaking ? '🚨' : ''}
+                    </span>
+                    <div>
+                        <button class="mini-btn" style="background:none; border:none; color:#888;" onclick="api('manage', {action:'move_up', index:${i}})">⬆️</button>
+                        <button class="mini-btn" style="background:none; border:none; color:#888;" onclick="api('manage', {action:'move_down', index:${i}})">⬇️</button>
+                    </div>
                 </div>
-                <div class="item-content" title="${displayText}">${displayText}</div>
-                <div class="controls-row">
-                    <button class="mini-btn play-btn" onclick="api('control', {action:'show', index:${i}})">▶️</button>
-                    <button class="mini-btn" style="background:#444;" onclick="openEdit(${i}, '${displayTitle.replace(/'/g, "\\'")}', '${displayText.replace(/'/g, "\\'").replace(/\n/g, ' ')}')" title="تعديل المحتوى">✏️</button>
-                    <button class="mini-btn" style="background:${isPinned?'#e6b800':'#333'}" onclick="editItem(${i}, 'togglePin', true)" title="تثبيت">📌</button>
-                    <button class="mini-btn" style="background:${isBreaking?'#f91880':'#333'}" onclick="editItem(${i}, 'toggleBreaking', true)" title="عاجل">🚨</button>
-                    <button class="mini-btn" style="background:#f00;" onclick="api('manage', {action:'delete', index:${i}})">🗑️</button>
+                
+                <div class="card-body" title="${displayText}">${displayText}</div>
+                
+                <div class="card-actions">
+                    <button class="action-btn btn-play" onclick="api('control', {action:'show', index:${i}})">تشغيل ▶️</button>
+                    <button class="action-btn" onclick="openEdit(${i}, '${displayTitle.replace(/'/g, "\\'")}', '${displayText.replace(/'/g, "\\'").replace(/\n/g, ' ')}')" title="تعديل">✏️</button>
+                    <button class="action-btn" style="color:${isPinned?'#e6b800':'#aaa'}" onclick="editItem(${i}, 'togglePin', true)" title="تثبيت">📌</button>
+                    <button class="action-btn" style="color:${isBreaking?'#f91880':'#aaa'}" onclick="editItem(${i}, 'toggleBreaking', true)" title="عاجل">🚨</button>
+                    <button class="action-btn btn-delete" onclick="api('manage', {action:'delete', index:${i}})">🗑️</button>
                 </div>
             `;
             list.appendChild(div);
@@ -241,7 +272,6 @@
         });
     }
 
-    // Modal Functions
     function openEdit(index, title, text) {
         document.getElementById('editIndex').value = index;
         document.getElementById('editTitle').value = title;
