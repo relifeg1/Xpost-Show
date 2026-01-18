@@ -1,298 +1,240 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZairuDuo Controller Pro 🎮</title>
+    <title>ZairuDuo Studio 🎙️</title>
     <style>
-        body {
-            background: #0f0f0f;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', sans-serif;
-            padding: 20px;
-            max-width: 700px;
-            margin: auto;
-        }
+        body { background: #0f0f0f; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
+        
+        /* Layout Grid */
+        .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
 
-        /* الأزرار والإدخال */
-        input,
-        select,
-        button {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #333;
-            background: #222;
-            color: white;
-            margin: 5px 0;
-            font-size: 14px;
-        }
+        /* Generic Styles */
+        input, select, button, textarea { padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: white; margin: 5px 0; font-size: 14px; width: 100%; box-sizing: border-box; }
+        button { cursor: pointer; font-weight: bold; transition: 0.2s; border: none; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .box { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .section-title { margin: 0 0 10px 0; font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-        button {
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-            border: none;
-        }
+        /* Tabs */
+        .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .tab-btn { background: #333; color: #aaa; flex: 1; border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; }
+        .tab-btn.active { background: #1d9bf0; color: white; border-bottom: 2px solid white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        button:hover {
-            opacity: 0.8;
-        }
+        /* Specific Buttons */
+        .btn-add { background: linear-gradient(45deg, #1d9bf0, #00ba7c); }
+        .btn-control { background: #333; border: 1px solid #555; }
+        .btn-active-auto { background: #00ba7c; color: white; animation: pulse 2s infinite; }
+        
+        /* Queue Item */
+        .tweet-item { background: #1e1e1e; padding: 10px; margin-bottom: 8px; border-radius: 8px; border-right: 4px solid #333; transition: all 0.3s; }
+        .tweet-item.active { border-right-color: #1d9bf0; background: #252a30; }
+        .tweet-item.pinned { border-right-color: #e6b800; }
+        .tweet-item.breaking { border-right-color: #f91880; background: rgba(249, 24, 128, 0.1); }
 
-        .btn-add {
-            background: #1d9bf0;
-            width: 100%;
-        }
+        .item-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .controls-row { display: flex; gap: 5px; }
+        .mini-btn { padding: 4px 8px; font-size: 12px; width: auto; }
 
-        .btn-control {
-            background: #00ba7c;
-            color: white;
-            width: 48%;
-        }
+        /* Preview Iframe */
+        .preview-container { width: 100%; height: 168px; overflow: hidden; position: relative; background: url('https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png'); background-size: cover; border-radius: 8px; border: 2px solid #333; }
+        iframe { width: 1280px; height: 720px; border: none; transform: scale(0.234); transform-origin: top left; pointer-events: none; }
 
-        .btn-hide {
-            background: #f91880;
-            width: 100%;
-            margin-top: 5px;
-        }
-
-        /* الصناديق */
-        .box {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #333;
-        }
-
-        /* إعدادات التبديل (Checkboxes) */
-        .settings-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            background: #252525;
-            padding: 8px;
-            border-radius: 6px;
-        }
-
-        .checkbox-label input {
-            margin: 0;
-            width: auto;
-        }
-
-        /* القائمة */
-        .tweet-item {
-            background: #1e1e1e;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border-right: 4px solid #333;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .tweet-item.active {
-            border-right-color: #1d9bf0;
-            background: #252a30;
-        }
-
-        .item-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .item-controls {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            background: #151515;
-            padding: 5px;
-            border-radius: 6px;
-        }
-
-        .badge {
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: #333;
-            color: #aaa;
-        }
-
-        .timer-input {
-            width: 50px !important;
-            padding: 5px;
-            text-align: center;
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
     </style>
 </head>
-
 <body>
 
-    <div class="box" style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-            <span id="statusIcon">⚪</span> <span id="statusText">جاري الاتصال...</span>
+<div class="main-grid">
+    <div>
+        <div class="box" style="display:flex; justify-content:space-between; align-items:center;">
+            <div><span id="statusIcon">⚪</span> <span id="statusText">...</span></div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <label><input type="checkbox" id="playSound" onchange="updateSettings()" style="width:auto;"> 🔊 صوت</label>
+                <input type="number" id="globalTimer" value="15" style="width:50px; text-align:center;" onchange="updateSettings()" title="المؤقت العام">
+            </div>
         </div>
-        <div>
-            <label style="font-size:12px; color:#aaa;">المؤقت العام (ث):</label>
-            <input type="number" id="globalTimer" style="width:50px; text-align:center;"
-                onchange="updateGlobalSettings()">
+
+        <div class="box" style="border-top: 3px solid #1d9bf0;">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('link')">🔗 رابط تويتر</button>
+                <button class="tab-btn" onclick="switchTab('custom')">✍️ بطاقة مخصصة</button>
+            </div>
+
+            <div id="tab-link" class="tab-content active">
+                <input type="text" id="tweetUrl" placeholder="https://x.com/..." autofocus>
+            </div>
+
+            <div id="tab-custom" class="tab-content">
+                <input type="text" id="customTitle" placeholder="العنوان (مثلاً: خبر عاجل)">
+                <textarea id="customText" rows="2" placeholder="اكتب نص الخبر هنا..."></textarea>
+                <input type="text" id="customImage" placeholder="رابط صورة (اختياري)">
+                <input type="text" id="customMedia" placeholder="رابط فيديو/صورة كبيرة (اختياري)">
+            </div>
+
+            <div style="display:flex; gap:5px; margin-top:10px;">
+                <select id="addTheme" style="flex:1;">
+                    <option value="classic">كلاسيك</option>
+                    <option value="chunky">ضخم (Chunky)</option>
+                    <option value="bubble">فقاعة</option>
+                    <option value="minimal">مينيمال</option>
+                </select>
+                <input type="number" id="addDuration" placeholder="وقت(ث)" style="width:70px; text-align:center;">
+            </div>
+            <button class="btn-add" onclick="addItem()">إضافة للقائمة ➕</button>
         </div>
+
+        <h3 class="section-title">قائمة التشغيل (<span id="count">0</span>)</h3>
+        <div id="queueList"></div>
     </div>
 
-    <div class="box">
-        <h4 style="margin:0 0 10px 0; font-size:14px; color:#aaa;">⚙️ إعدادات العرض (تطبق على الكل)</h4>
-        <div class="settings-grid">
-            <label class="checkbox-label"><input type="checkbox" id="showAvatar" onchange="updateGlobalSettings()"> صورة
-                العرض</label>
-            <label class="checkbox-label"><input type="checkbox" id="showName" onchange="updateGlobalSettings()">
-                الاسم</label>
-            <label class="checkbox-label"><input type="checkbox" id="showUsername" onchange="updateGlobalSettings()">
-                اليوزر (@)</label>
-            <label class="checkbox-label"><input type="checkbox" id="showDate" onchange="updateGlobalSettings()">
-                التاريخ</label>
-            <label class="checkbox-label"><input type="checkbox" id="showMedia" onchange="updateGlobalSettings()">
-                الصور/الفيديو</label>
+    <div>
+        <div class="box">
+            <h4 class="section-title">👁️ معاينة البث (Live)</h4>
+            <div class="preview-container">
+                <iframe src="/overlay.html" scrolling="no"></iframe>
+            </div>
+        </div>
+
+        <div class="box">
+            <h4 class="section-title">🎮 التحكم</h4>
+            <div style="display:flex; gap:5px;">
+                <button class="btn-control" onclick="api('control', {action:'prev'})">⏮️</button>
+                <button class="btn-control" onclick="api('control', {action:'next'})">⏭️</button>
+            </div>
+            <button id="btnAuto" class="btn-control" style="width:100%; margin-top:5px;" onclick="api('control', {action:'toggle_auto'})">تشغيل تلقائي ⏯️</button>
+            <button class="btn-control" style="width:100%; margin-top:5px; background:#f91880; color:white;" onclick="api('control', {action:'hide'})">إخفاء نهائي ⏹️</button>
+        </div>
+
+        <div class="box">
+            <h4 class="section-title">⚙️ ظهور العناصر</h4>
+            <label><input type="checkbox" id="showAvatar" onchange="updateSettings()" style="width:auto;"> صورة</label>
+            <label><input type="checkbox" id="showName" onchange="updateSettings()" style="width:auto;"> اسم</label>
+            <label><input type="checkbox" id="showMedia" onchange="updateSettings()" style="width:auto;"> ميديا</label>
+            <label><input type="checkbox" id="showDate" onchange="updateSettings()" style="width:auto;"> تاريخ</label>
         </div>
     </div>
+</div>
 
-    <div class="box" style="border-color: #1d9bf0;">
-        <div style="display:flex; gap:5px; margin-bottom:5px;">
-            <select id="addTheme" style="flex:1;">
-                <option value="classic">كلاسيك (الممتاز) ⭐</option>
-                <option value="chunky">الضخم (Chunky)</option>
-                <option value="bubble">الفقاعة (Bubble)</option>
-                <option value="minimal">مينيمال (Minimal)</option>
-            </select>
-            <input type="number" id="addDuration" placeholder="وقت (ث)" style="width:70px; text-align:center;"
-                title="مؤقت خاص لهذه التغريدة">
-        </div>
-        <input type="text" id="tweetUrl" placeholder="رابط التغريدة..." style="width:100%; box-sizing:border-box;">
-        <button class="btn-add" onclick="addTweet()">إضافة للقائمة ➕</button>
-    </div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    let currentMode = 'link';
 
-    <div style="margin-bottom:15px;">
-        <button class="btn-control" onclick="api('control', {action:'prev'})">⏮️ السابق</button>
-        <button class="btn-control" onclick="api('control', {action:'next'})">التالي ⏭️</button>
-        <button class="btn-control" style="width:100%; margin-top:5px; background:#e6b800;"
-            onclick="api('control', {action:'toggle_auto'})">تشغيل / إيقاف التلقائي ⏯️</button>
-        <button class="btn-hide" onclick="api('control', {action:'hide'})">إخفاء 👁️</button>
-    </div>
+    function switchTab(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector(`.tab-btn[onclick="switchTab('${mode}')"]`).classList.add('active');
+        document.getElementById(`tab-${mode}`).classList.add('active');
+    }
 
-    <h3>القائمة (<span id="count">0</span>)</h3>
-    <div id="queueList"></div>
+    socket.on('state_update', (state) => {
+        // تحديث الحالة
+        document.getElementById('count').innerText = state.queue.length;
+        document.getElementById('statusText').innerText = state.isAuto ? "تلقائي يعمل" : "يدوي";
+        document.getElementById('statusIcon').innerText = state.isAuto ? "🟢" : "⏸️";
+        
+        const btnAuto = document.getElementById('btnAuto');
+        if(state.isAuto) btnAuto.classList.add('btn-active-auto'); else btnAuto.classList.remove('btn-active-auto');
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
+        // تحديث الإعدادات
+        if(state.settings) {
+            document.getElementById('showAvatar').checked = state.settings.showAvatar;
+            document.getElementById('showName').checked = state.settings.showName;
+            document.getElementById('showMedia').checked = state.settings.showMedia;
+            document.getElementById('showDate').checked = state.settings.showDate;
+            document.getElementById('playSound').checked = state.settings.playSound;
+            document.getElementById('globalTimer').value = state.settings.defaultDuration || 15;
+        }
 
-        // تحديث الواجهة عند وصول بيانات من السيرفر
-        socket.on('state_update', (state) => {
-            document.getElementById('count').innerText = state.queue.length;
-            document.getElementById('statusText').innerText = state.isAuto ? "تلقائي ON" : "يدوي OFF";
-            document.getElementById('statusIcon').innerText = state.isAuto ? "🟢" : "⏸️";
-
-            // تحديث الإعدادات العامة
-            if (state.settings) {
-                document.getElementById('showAvatar').checked = state.settings.showAvatar;
-                document.getElementById('showName').checked = state.settings.showName;
-                document.getElementById('showUsername').checked = state.settings.showUsername;
-                document.getElementById('showDate').checked = state.settings.showDate;
-                document.getElementById('showMedia').checked = state.settings.showMedia;
-                document.getElementById('globalTimer').value = state.settings.defaultDuration || 10;
-            }
-
-            // بناء القائمة
-            const list = document.getElementById('queueList');
-            list.innerHTML = '';
-
-            state.queue.forEach((t, i) => {
-                const div = document.createElement('div');
-                div.className = `tweet-item ${i === state.current ? 'active' : ''}`;
-
-                const theme = t.customSettings?.theme || 'classic';
-                const duration = t.customDuration || ''; // فارغ يعني استخدام العام
-
-                div.innerHTML = `
-                    <div class="item-top">
-                        <div style="flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
-                            <span class="badge">${theme}</span>
-                            <b>#${i + 1}</b> ${t.text || 'ميديا'}
-                        </div>
-                        <button onclick="api('manage', {action:'delete', index:${i}})" style="background:#f00; padding:4px 8px; font-size:12px;">🗑️</button>
+        // بناء القائمة
+        const list = document.getElementById('queueList');
+        list.innerHTML = '';
+        state.queue.forEach((t, i) => {
+            const div = document.createElement('div');
+            const isPinned = t.customSettings?.pinned;
+            const isBreaking = t.customSettings?.breaking;
+            
+            div.className = `tweet-item ${i === state.current ? 'active' : ''} ${isPinned ? 'pinned' : ''} ${isBreaking ? 'breaking' : ''}`;
+            
+            div.innerHTML = `
+                <div class="item-row">
+                    <div style="flex:1; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        <b>#${i+1}</b> ${t.text || 'محتوى ميديا'}
                     </div>
-                    
-                    <div class="item-controls">
-                        <button onclick="api('control', {action:'show', index:${i}})" style="background:#1d9bf0; flex:1;">عرض ▶️</button>
-                        
-                        <select class="mini-input" onchange="editTweet(${i}, 'theme', this.value)" style="width:80px; margin:0;">
-                            <option value="classic" ${theme == 'classic' ? 'selected' : ''}>كلاسيك</option>
-                            <option value="chunky" ${theme == 'chunky' ? 'selected' : ''}>ضخم</option>
-                            <option value="bubble" ${theme == 'bubble' ? 'selected' : ''}>فقاعة</option>
-                            <option value="minimal" ${theme == 'minimal' ? 'selected' : ''}>مينيمال</option>
-                        </select>
-
-                        <input type="number" class="timer-input" value="${duration}" placeholder="عام" 
-                               onchange="editTweet(${i}, 'duration', this.value)" title="وقت خاص بالثواني (اتركه فارغاً للعام)">
-                    </div>
-                `;
-                list.appendChild(div);
-            });
+                    ${isPinned ? '📌' : ''} ${isBreaking ? '🚨' : ''}
+                </div>
+                <div class="controls-row">
+                    <button class="mini-btn" style="background:#1d9bf0; flex:1;" onclick="api('control', {action:'show', index:${i}})">عرض ▶️</button>
+                    <button class="mini-btn" style="background:${isPinned?'#e6b800':'#333'}" onclick="editItem(${i}, 'togglePin', true)" title="تثبيت (يوقف المؤقت)">📌</button>
+                    <button class="mini-btn" style="background:${isBreaking?'#f91880':'#333'}" onclick="editItem(${i}, 'toggleBreaking', true)" title="خبر عاجل">🚨</button>
+                    <button class="mini-btn" style="background:#f00;" onclick="api('manage', {action:'delete', index:${i}})">🗑️</button>
+                </div>
+            `;
+            list.appendChild(div);
         });
+    });
 
-        // دوال الاتصال بالسيرفر
-        function api(endpoint, data) {
-            // تحويل اسم الدالة المختصر إلى المسار الكامل
-            const path = endpoint === 'manage' ? '/api/manage' : '/api/control';
-            fetch(path, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+    function addItem() {
+        const theme = document.getElementById('addTheme').value;
+        const duration = document.getElementById('addDuration').value;
+
+        let payload = { mode: currentMode, theme, duration };
+
+        if (currentMode === 'link') {
+            payload.url = document.getElementById('tweetUrl').value;
+        } else {
+            payload.title = document.getElementById('customTitle').value;
+            payload.text = document.getElementById('customText').value;
+            payload.image = document.getElementById('customImage').value;
+            payload.mediaUrl = document.getElementById('customMedia').value;
         }
 
-        function addTweet() {
-            const url = document.getElementById('tweetUrl').value;
-            const theme = document.getElementById('addTheme').value;
-            const duration = document.getElementById('addDuration').value;
+        fetch('/api/add', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        }).then(() => {
+            // تنظيف الحقول
+            if(currentMode==='link') document.getElementById('tweetUrl').value = '';
+            else {
+                document.getElementById('customTitle').value = '';
+                document.getElementById('customText').value = '';
+            }
+        });
+    }
 
-            fetch('/api/add', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, theme, duration })
-            }).then(() => document.getElementById('tweetUrl').value = '');
-        }
+    function api(endpoint, data) {
+        fetch(endpoint === 'manage' ? '/api/manage' : '/api/control', {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+        });
+    }
 
-        function editTweet(index, type, value) {
-            fetch('/api/edit_tweet', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ index, [type]: value })
-            });
-        }
+    function editItem(index, actionType, val) {
+        fetch('/api/edit_tweet', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ index, [actionType]: val })
+        });
+    }
 
-        function updateGlobalSettings() {
-            const settings = {
-                showAvatar: document.getElementById('showAvatar').checked,
-                showName: document.getElementById('showName').checked,
-                showUsername: document.getElementById('showUsername').checked,
-                showDate: document.getElementById('showDate').checked,
-                showMedia: document.getElementById('showMedia').checked,
-                defaultDuration: parseInt(document.getElementById('globalTimer').value) || 10
-            };
-            fetch('/api/settings', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(settings)
-            });
-        }
-    </script>
+    function updateSettings() {
+        const settings = {
+            showAvatar: document.getElementById('showAvatar').checked,
+            showName: document.getElementById('showName').checked,
+            showMedia: document.getElementById('showMedia').checked,
+            showDate: document.getElementById('showDate').checked,
+            playSound: document.getElementById('playSound').checked,
+            defaultDuration: parseInt(document.getElementById('globalTimer').value) || 15
+        };
+        fetch('/api/settings', {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(settings)
+        });
+    }
+</script>
 </body>
-
 </html>

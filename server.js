@@ -18,19 +18,14 @@ let queue = [];
 let currentIndex = -1;
 let autoState = { active: false, timer: null };
 
-// الإعدادات العامة الافتراضية
+// الإعدادات العامة
 let globalSettings = { 
     theme: 'classic', 
-    showAvatar: true, 
-    showName: true, 
-    showUsername: true,
-    showMedia: true, 
-    showDate: true, 
-    scale: 1.0, 
-    defaultDuration: 10 // المؤقت العام بالثواني
+    showAvatar: true, showName: true, showUsername: true,
+    showMedia: true, showDate: true, playSound: true,
+    defaultDuration: 15
 };
 
-// --- دوال الحفظ والاسترجاع ---
 async function loadDatabase() {
     try {
         const res = await axios.get(API_URL);
@@ -54,10 +49,7 @@ loadDatabase();
 
 function updateAdmin() {
     io.emit('state_update', { 
-        queue, 
-        current: currentIndex, 
-        isAuto: autoState.active, 
-        settings: globalSettings 
+        queue, current: currentIndex, isAuto: autoState.active, settings: globalSettings 
     });
 }
 
@@ -66,66 +58,105 @@ function showTweet(index) {
     currentIndex = index;
     const tweet = queue[currentIndex];
     
-    // دمج الإعدادات: إعدادات الثيم الخاصة بالتغريدة + الإعدادات العامة للظهور والإخفاء
     const finalSettings = { 
         ...globalSettings, 
-        theme: (tweet.customSettings && tweet.customSettings.theme) ? tweet.customSettings.theme : globalSettings.theme
+        theme: tweet.customSettings?.theme || globalSettings.theme
     };
 
     io.emit('show_tweet', { 
         data: tweet, 
         index: currentIndex + 1, 
         total: queue.length, 
-        settings: finalSettings 
+        settings: finalSettings,
+        isPinned: tweet.customSettings?.pinned || false,
+        isBreaking: tweet.customSettings?.breaking || false
     });
     updateAdmin();
 
+    // إدارة المؤقت التلقائي
     if (autoState.active) {
         clearTimeout(autoState.timer);
-        // الأولوية للمؤقت الخاص، وإذا لم يوجد نستخدم العام
+        
+        // 🛑 إذا كان الخبر مثبتاً (Pinned)، لا نشغل المؤقت 🛑
+        if (tweet.customSettings?.pinned) {
+            console.log("📌 الخبر مثبت: توقف المؤقت التلقائي مؤقتاً.");
+            return; 
+        }
+
         const duration = (tweet.customDuration || globalSettings.defaultDuration) * 1000;
         autoState.timer = setTimeout(() => { showTweet((currentIndex + 1) % queue.length); }, duration);
     }
 }
 
-async function processAdd(url, theme, duration, res) {
+// إضافة تغريدة (رابط)
+async function processAddUrl(url, theme, duration, res) {
     const idMatch = url && url.match(/(?:twitter|x)\.com\/.*\/status\/(\d+)/);
     if (idMatch && idMatch[1]) {
-        if (queue.find(t => t.id_str === idMatch[1])) {
-            return res.send ? res.send("Already Exists") : res.json({ success: false });
-        }
+        if (queue.find(t => t.id_str === idMatch[1])) return res.json({ success: false, msg: 'موجود مسبقاً' });
         try {
             const resp = await axios.get(`https://cdn.syndication.twimg.com/tweet-result?id=${idMatch[1]}&token=x`);
-            
             const newTweet = { 
                 ...resp.data, 
-                customSettings: { theme: theme || 'classic' }, 
-                customDuration: duration ? parseInt(duration) : null // حفظ المؤقت الخاص إن وجد
+                type: 'tweet',
+                customSettings: { theme: theme || 'classic', pinned: false, breaking: false }, 
+                customDuration: duration ? parseInt(duration) : null
             };
-            
             queue.push(newTweet);
-            updateAdmin();
-            saveDatabase();
-            return res.send ? res.send("Added") : res.json({ success: true });
-        } catch (e) { return res.status(500).json({ error: 'Error Fetching' }); }
-    } else { return res.status(400).json({ error: 'Invalid URL' }); }
+            saveAndRespond(res);
+        } catch (e) { res.status(500).json({ error: 'خطأ في جلب التغريدة' }); }
+    } else { res.status(400).json({ error: 'رابط غير صحيح' }); }
+}
+
+// إضافة بطاقة مخصصة (Custom Card)
+function processAddCustom(data, res) {
+    const newCard = {
+        type: 'custom',
+        id_str: 'custom_' + Date.now(),
+        text: data.text,
+        user: {
+            name: data.title || 'خبر مخصص',
+            screen_name: 'ZairuDuo',
+            profile_image_url_https: data.image || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png'
+        },
+        created_at: new Date().toISOString(),
+        mediaDetails: data.mediaUrl ? [{ media_url_https: data.mediaUrl, type: 'photo' }] : [],
+        customSettings: { theme: data.theme || 'classic', pinned: false, breaking: false },
+        customDuration: data.duration ? parseInt(data.duration) : null
+    };
+    queue.push(newCard);
+    saveAndRespond(res);
+}
+
+function saveAndRespond(res) {
+    updateAdmin();
+    saveDatabase();
+    res.json({ success: true });
 }
 
 // --- APIs ---
 
 app.post('/api/add', async (req, res) => {
-    let { url, theme, duration } = req.body;
-    if (url) await processAdd(url, theme, duration, res); else res.status(400).json({ error: 'No URL' });
+    // التمييز بين إضافة رابط وإضافة بطاقة مخصصة
+    if (req.body.mode === 'custom') {
+        processAddCustom(req.body, res);
+    } else {
+        if (req.body.url) await processAddUrl(req.body.url, req.body.theme, req.body.duration, res);
+        else res.status(400).json({ error: 'No URL' });
+    }
 });
 
 app.post('/api/edit_tweet', (req, res) => {
-    const { index, theme, duration } = req.body;
+    const { index, theme, duration, togglePin, toggleBreaking } = req.body;
     if (queue[index]) {
         if (!queue[index].customSettings) queue[index].customSettings = {};
+        
         if (theme) queue[index].customSettings.theme = theme;
         if (duration !== undefined) queue[index].customDuration = duration ? parseInt(duration) : null;
+        if (togglePin) queue[index].customSettings.pinned = !queue[index].customSettings.pinned;
+        if (toggleBreaking) queue[index].customSettings.breaking = !queue[index].customSettings.breaking;
         
         saveDatabase();
+        // إذا تغير شيء مؤثر (مثل التثبيت) والخبر معروض، نعيد تحديث العرض
         if (currentIndex === index) showTweet(index); else updateAdmin();
     }
     res.json({ success: true });
@@ -149,6 +180,7 @@ app.post('/api/control', (req, res) => {
         if (autoState.active) { currentIndex === -1 ? showTweet(0) : showTweet(currentIndex); } 
         else { clearTimeout(autoState.timer); updateAdmin(); }
     }
+    else if (action === 'hide') { io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; updateAdmin(); }
     res.json({ success: true });
 });
 
@@ -164,14 +196,11 @@ app.post('/api/manage', (req, res) => {
     saveDatabase(); updateAdmin(); res.json({ success: true });
 });
 
-// Stream Deck & Debug
-app.get('/trigger_add', (req, res) => res.send("Use Admin Page"));
+// Stream Deck Helper
 app.get('/trigger_next', (req, res) => { if(queue.length){ showTweet((currentIndex+1)%queue.length); res.send("Next"); } else res.send("Empty"); });
 app.get('/trigger_prev', (req, res) => { if(queue.length){ showTweet((currentIndex-1+queue.length)%queue.length); res.send("Prev"); } else res.send("Empty"); });
 app.get('/trigger_auto', (req, res) => { autoState.active = !autoState.active; if(autoState.active) (currentIndex===-1?showTweet(0):showTweet(currentIndex)); else { clearTimeout(autoState.timer); updateAdmin(); } res.send(autoState.active?"Auto ON":"Auto OFF"); });
 app.get('/hide', (req, res) => { io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; updateAdmin(); res.send('Hidden'); });
-app.get('/debug-save', async (req, res) => { try { const r = await axios.get(API_URL); res.send(`Queue: ${r.data.queue.length}`); } catch(e){ res.send(e.message); } });
 
-io.on('connection', (s) => updateAdmin());
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Server Ready on ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Pro Server Ready on ${PORT}`));

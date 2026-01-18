@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Tweet Overlay</title>
+    <title>Overlay Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
         body {
             margin: 0;
@@ -19,30 +20,51 @@
             bottom: 50px;
             right: 50px;
             width: 500px;
-            /* عرض ثابت للتحكم */
-            transition: all 0.5s ease;
+            /* الانتقالات السلسة */
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* تنسيق الميديا العام لحل مشكلة الصور الطولية */
+        /* شريط التقدم */
+        #progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0 0 16px 16px;
+            overflow: hidden;
+            display: none;
+            /* يظهر فقط في الوضع التلقائي */
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #1d9bf0;
+            transition: width linear;
+        }
+
+        /* تنسيق الميديا */
         .media img,
         .media video {
             width: 100%;
             border-radius: 12px;
             margin-top: 10px;
-            /* 🔥 هذا السطر هو الحل السحري للميديا الطويلة 🔥 */
             max-height: 450px;
             object-fit: contain;
             background: rgba(0, 0, 0, 0.05);
-            /* خلفية خفيفة إذا كانت الصورة صغيرة */
         }
 
-        /* === 1. كلاسيك (المفضل لديك) === */
+        /* === Styles (Themes) === */
+        /* Classic */
         .style-classic .card {
             background: #fff;
             border-radius: 16px;
             padding: 20px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
             color: #000;
+            position: relative;
         }
 
         .style-classic .header {
@@ -82,7 +104,7 @@
             display: block;
         }
 
-        /* === 2. Chunky (الضخم) === */
+        /* Chunky */
         .style-chunky .card {
             background: #000;
             border: 4px solid #1d9bf0;
@@ -90,6 +112,7 @@
             padding: 20px;
             color: #fff;
             box-shadow: 0 0 0 8px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
 
         .style-chunky .header {
@@ -114,26 +137,16 @@
             color: #1d9bf0;
         }
 
-        .style-chunky .username {
-            display: none;
-        }
-
-        /* نخفي اليوزر لتوفير المساحة */
         .style-chunky .text {
             font-size: 2rem;
             font-weight: 900;
             line-height: 1.2;
         }
 
-        /* إجبار الميديا في الستايل الضخم ألا تأخذ مساحة كبيرة */
-        .style-chunky .media img {
-            border: 2px solid #333;
-            max-height: 350px;
-        }
-
-        /* === 3. Bubble (الفقاعة) === */
+        /* Bubble */
         .style-bubble .card {
             background: transparent;
+            position: relative;
         }
 
         .style-bubble .header {
@@ -158,54 +171,65 @@
             padding: 4px 12px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 0.9rem;
             margin-right: -15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .style-bubble .content-box {
             background: #fff;
             color: #000;
-            padding: 20px 20px;
+            padding: 20px;
             border-radius: 20px;
             border-top-right-radius: 0;
             font-size: 1.3rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             margin-top: 5px;
             font-weight: 600;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* === 4. Minimal === */
-        .style-minimal .card {
-            background: rgba(0, 0, 0, 0.8);
-            border-right: 6px solid #1d9bf0;
-            padding: 15px;
+        /* Breaking News Mode 🚨 */
+        .breaking-mode .card {
+            border: 4px solid #f91880 !important;
+            animation: flashBorder 2s infinite;
+        }
+
+        .breaking-mode .name,
+        .breaking-mode .name-badge {
+            color: #f91880 !important;
+        }
+
+        .breaking-label {
+            display: none;
+            background: #f91880;
             color: white;
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-        }
-
-        .style-minimal .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .style-minimal .avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            margin-left: 10px;
-        }
-
-        .style-minimal .name {
+            padding: 2px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            z-index: 10;
             font-weight: bold;
-            color: #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
-        .style-minimal .text {
-            font-size: 1.5rem;
-            font-weight: 600;
+        .breaking-mode .breaking-label {
+            display: block;
+        }
+
+        @keyframes flashBorder {
+            0% {
+                box-shadow: 0 0 0 0 rgba(249, 24, 128, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(249, 24, 128, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(249, 24, 128, 0);
+            }
         }
     </style>
 </head>
@@ -213,89 +237,115 @@
 <body>
     <div id="container"></div>
 
+    <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3"></audio>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         const container = document.getElementById('container');
+        const audio = document.getElementById('notifSound');
+        let currentTimer = null;
 
-        function renderTweet(data, settings) {
+        function renderTweet(data, settings, isBreaking, isPinned) {
             const theme = settings.theme || 'classic';
-            container.className = `style-${theme}`;
 
-            // 1. معالجة الميديا (صور/فيديو)
+            // 1. إعداد الكلاسات (Theme + Breaking)
+            container.className = `style-${theme} ${isBreaking ? 'breaking-mode' : ''}`;
+
+            // 2. معالجة النصوص والميديا
+            const formattedText = data.text.replace(/(https?:\/\/[^\s]+)/g, '');
             let mediaHtml = '';
             if (settings.showMedia && data.mediaDetails && data.mediaDetails.length > 0) {
-                // نأخذ أول ميديا فقط للعرض
                 mediaHtml = `<div class="media"><img src="${data.mediaDetails[0].media_url_https}"></div>`;
             }
 
-            // 2. معالجة النصوص والروابط
-            const formattedText = data.text.replace(/(https?:\/\/[^\s]+)/g, '');
-
-            // 3. بناء الهيدر (صورة + اسم + يوزر)
+            // 3. بناء الهيدر
             let headerHtml = '';
-            if (settings.showAvatar || settings.showName || settings.showUsername) {
+            if (settings.showAvatar || settings.showName) {
                 headerHtml += `<div class="header">`;
                 if (settings.showAvatar) headerHtml += `<img class="avatar" src="${data.user.profile_image_url_https.replace('_normal', '')}">`;
                 headerHtml += `<div>`;
                 if (settings.showName) headerHtml += `<div class="name">${data.user.name}</div>`;
                 if (settings.showUsername) headerHtml += `<div class="username">@${data.user.screen_name}</div>`;
-                headerHtml += `</div>`;
-                // إضافة خاصة لثيم الفقاعة
-                if (theme === 'bubble' && settings.showName) headerHtml += `<div class="name-badge">${data.user.name}</div>`;
-                headerHtml += `</div>`;
+                headerHtml += `</div></div>`;
             }
 
-            // 4. بناء التذييل (التاريخ)
+            // 4. التذييل (التاريخ)
             let footerHtml = '';
             if (settings.showDate) {
                 const dateStr = new Date(data.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
                 footerHtml = `<span class="date">${dateStr}</span>`;
             }
 
-            // 5. تجميع القوالب حسب الثيم
-            let html = '';
-
-            if (theme === 'bubble') {
-                // ثيم الفقاعة له هيكل خاص
-                html = `
-                    <div class="card animate__animated animate__fadeInUp">
-                        ${settings.showAvatar ? `<div class="header"><img class="avatar" src="${data.user.profile_image_url_https}"> ${settings.showName ? `<div class="name-badge">${data.user.name}</div>` : ''}</div>` : ''}
-                        <div class="content-box">
-                            <div class="text">${formattedText}</div>
-                            ${mediaHtml}
-                            ${footerHtml}
-                        </div>
-                    </div>
-                `;
-            } else {
-                // باقي الثيمات (كلاسيك، تشانكي، مينيمال)
-                html = `
-                    <div class="card animate__animated animate__fadeInUp">
-                        ${headerHtml}
+            // 5. بناء HTML النهائي
+            let html = `
+                <div class="card animate__animated animate__backInRight">
+                    <div class="breaking-label">🚨 خبر عاجل</div>
+                    ${theme === 'bubble' ? '' : headerHtml}
+                    ${theme === 'bubble' && settings.showAvatar ? `<div class="header"><img class="avatar" src="${data.user.profile_image_url_https}"> <div class="name-badge">${data.user.name}</div></div>` : ''}
+                    
+                    <div class="${theme === 'bubble' ? 'content-box' : ''}">
                         <div class="text">${formattedText}</div>
                         ${mediaHtml}
                         ${footerHtml}
+                        <div id="progress-bar-container"><div id="progress-bar"></div></div>
                     </div>
-                `;
-            }
+                </div>
+            `;
 
             container.innerHTML = html;
             container.style.display = 'block';
+
+            // 6. تشغيل الصوت
+            if (settings.playSound) {
+                audio.volume = 0.5;
+                audio.play().catch(e => console.log("Audio needs interaction first"));
+            }
+        }
+
+        // دالة تحريك شريط التقدم
+        function startProgress(duration, isPinned) {
+            const barContainer = document.getElementById('progress-bar-container');
+            const bar = document.getElementById('progress-bar');
+
+            if (!barContainer || !bar) return;
+
+            // إذا كان مثبت، لا نظهر الشريط أو نجعله ثابتاً
+            if (isPinned) {
+                barContainer.style.display = 'none';
+                return;
+            }
+
+            barContainer.style.display = 'block';
+            bar.style.width = '0%';
+            bar.style.transition = 'none'; // ريست
+
+            setTimeout(() => {
+                bar.style.transition = `width ${duration}ms linear`;
+                bar.style.width = '100%';
+            }, 50);
         }
 
         socket.on('show_tweet', (msg) => {
-            renderTweet(msg.data, msg.settings);
+            renderTweet(msg.data, msg.settings, msg.isBreaking, msg.isPinned);
+
+            // حساب وقت العرض للشريط
+            const duration = (msg.data.customDuration || msg.settings.defaultDuration || 15) * 1000;
+
+            // تشغيل الشريط فقط إذا كان الوضع التلقائي يعمل في السيرفر (نحتاج لتمرير حالة الأوتو، لكن هنا سنفترض العمل)
+            // لتحسين الدقة، سنعتمد على أن السيرفر يرسل الحدث كل X ثانية
+            startProgress(duration, msg.isPinned);
         });
 
         socket.on('hide_tweet', () => {
-            container.style.display = 'none';
-        });
-
-        // تحديث فوري للإعدادات إذا كان هناك تغريدة معروضة
-        socket.on('state_update', (state) => {
-            // ميزة إضافية: لو أردت تحديث التغريدة المعروضة فوراً عند ضغط Checkbox يمكنك تفعيل هذا
-            // لكن سنكتفي بالتحديث عند العرض التالي لتجنب الرمش
+            const card = document.querySelector('.card');
+            if (card) {
+                card.classList.remove('animate__backInRight');
+                card.classList.add('animate__backOutRight'); // تأثير خروج
+                setTimeout(() => container.style.display = 'none', 500);
+            } else {
+                container.style.display = 'none';
+            }
         });
     </script>
 </body>
