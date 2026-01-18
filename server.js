@@ -11,7 +11,7 @@ const io = new Server(server);
 app.use(express.json());
 app.use(express.static('public'));
 
-// 🔥 إعدادات الحفظ (JSONBlob) - تم دمج الرابط الخاص بك 🔥
+// 🔥 إعدادات الحفظ (JSONBlob) 🔥
 const BLOB_ID = '019bcdd9-7c76-7d01-a193-def55c292a99'; 
 const API_URL = `https://jsonblob.com/api/jsonBlob/${BLOB_ID}`;
 
@@ -37,11 +37,11 @@ async function loadDatabase() {
         if (data) {
             if (data.queue) queue = data.queue;
             if (data.settings) globalSettings = data.settings;
-            console.log(`✅ تم استرجاع ${queue.length} تغريدة.`);
+            console.log(`✅ تم استرجاع ${queue.length} تغريدة من السحابة.`);
             updateAdmin();
         }
     } catch (e) {
-        console.error("⚠️ لم يتم العثور على بيانات سابقة أو حدث خطأ:", e.message);
+        console.error("⚠️ فشل استرجاع البيانات:", e.message);
     }
 }
 
@@ -55,7 +55,7 @@ async function saveDatabase() {
         await axios.put(API_URL, payload, {
             headers: { 'Content-Type': 'application/json' }
         });
-        console.log("💾 تم الحفظ في JSONBlob.");
+        console.log("💾 تم الحفظ في JSONBlob بنجاح.");
     } catch (e) {
         console.error("❌ فشل الحفظ السحابي:", e.message);
     }
@@ -101,7 +101,7 @@ async function processAdd(url, res) {
             queue.push({ ...resp.data, customSettings: null, customDuration: null });
             
             updateAdmin();
-            saveDatabase(); // حفظ سحابي
+            saveDatabase(); // حفظ فوري للسحابة
             
             return res.send ? res.send("Added") : res.json({ success: true });
         } catch (e) { 
@@ -116,7 +116,6 @@ async function processAdd(url, res) {
 
 app.post('/api/add', async (req, res) => {
     let url = req.body.url;
-    // محاولة القراءة من الحافظة (للمحلي فقط)
     if (!url) { try { url = await clipboardy.read(); } catch(e) {} }
     await processAdd(url, res);
 });
@@ -143,7 +142,7 @@ app.post('/api/edit_tweet', (req, res) => {
         queue[index].customSettings = customSettings;
         queue[index].customDuration = customDuration;
         if (currentIndex === index) showTweet(index); else updateAdmin();
-        saveDatabase(); // حفظ سحابي
+        saveDatabase(); // حفظ فوري للسحابة
     }
     res.json({ success: true });
 });
@@ -168,7 +167,7 @@ app.post('/api/manage', (req, res) => {
     
     updateAdmin();
     if (action.includes('move') && currentIndex !== -1) showTweet(currentIndex);
-    saveDatabase(); // حفظ سحابي
+    saveDatabase(); // حفظ فوري للسحابة
     res.json({ success: true });
 });
 
@@ -176,7 +175,7 @@ app.post('/api/settings', (req, res) => {
     globalSettings = { ...globalSettings, ...req.body };
     io.emit('state_update', { settings: globalSettings });
     if (currentIndex !== -1 && !queue[currentIndex].customSettings) showTweet(currentIndex);
-    saveDatabase(); // حفظ سحابي
+    saveDatabase(); // حفظ فوري للسحابة
     res.json({ success: true });
 });
 
@@ -188,6 +187,42 @@ app.get('/trigger_next', (req, res) => { if(queue.length){ showTweet((currentInd
 app.get('/trigger_prev', (req, res) => { if(queue.length){ showTweet((currentIndex - 1 + queue.length) % queue.length); res.send("Prev"); } else res.send("Empty"); });
 app.get('/trigger_auto', (req, res) => { autoState.active = !autoState.active; if(autoState.active) (currentIndex===-1?showTweet(0):showTweet(currentIndex)); else { clearTimeout(autoState.timer); updateAdmin(); } res.send(autoState.active?"Auto ON":"Auto OFF"); });
 app.get('/hide', (req, res) => { io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; updateAdmin(); res.send('Hidden'); });
+
+// 🔥🔥🔥 رابط الفحص (التشخيص) 🔥🔥🔥
+app.get('/debug-save', async (req, res) => {
+    try {
+        // تجربة القراءة
+        const readRes = await axios.get(API_URL);
+        const currentData = readRes.data;
+        
+        // تجربة الكتابة (إرسال القائمة الحالية كما هي)
+        const payload = {
+            queue: queue,
+            settings: globalSettings,
+            updatedAt: new Date().toISOString(),
+            debug_test: "Connection Successful"
+        };
+        
+        await axios.put(API_URL, payload, { headers: { 'Content-Type': 'application/json' } });
+        
+        res.send(`
+            <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+                <h1 style="color: green;">✅ الاتصال ناجح!</h1>
+                <p>السيرفر متصل بـ JSONBlob بشكل صحيح.</p>
+                <p>عدد التغريدات المحفوظة في الذاكرة الآن: <strong>${queue.length}</strong></p>
+                <p><a href="https://jsonblob.com/${BLOB_ID}" target="_blank">اضغط هنا لرؤية البيانات في موقع JSONBlob</a></p>
+            </div>
+        `);
+    } catch (e) {
+        res.status(500).send(`
+            <div style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+                <h1 style="color: red;">❌ الاتصال فشل</h1>
+                <p>الخطأ: ${e.message}</p>
+                <p>تأكد من أن الرابط في الكود صحيح.</p>
+            </div>
+        `);
+    }
+});
 
 io.on('connection', (s) => updateAdmin());
 
