@@ -48,6 +48,7 @@ async function saveDatabase() {
 loadDatabase();
 
 function updateAdmin() {
+    // إرسال تحديث فوري لكل المتصلين
     io.emit('state_update', { 
         queue, current: currentIndex, isAuto: autoState.active, settings: globalSettings 
     });
@@ -73,19 +74,20 @@ function showTweet(index) {
     });
     updateAdmin();
 
-    // إدارة المؤقت التلقائي
     if (autoState.active) {
         clearTimeout(autoState.timer);
-        
-        // 🛑 إذا كان الخبر مثبتاً (Pinned)، لا نشغل المؤقت 🛑
-        if (tweet.customSettings?.pinned) {
-            console.log("📌 الخبر مثبت: توقف المؤقت التلقائي مؤقتاً.");
-            return; 
-        }
+        if (tweet.customSettings?.pinned) return; // لا مؤقت للمثبت
 
         const duration = (tweet.customDuration || globalSettings.defaultDuration) * 1000;
         autoState.timer = setTimeout(() => { showTweet((currentIndex + 1) % queue.length); }, duration);
     }
+}
+
+// دالة الحفظ والاستجابة الموحدة
+function saveAndRespond(res) {
+    updateAdmin(); // تحديث فوري للشاشة والأدمن
+    saveDatabase(); // حفظ في الخلفية
+    res.json({ success: true });
 }
 
 // إضافة تغريدة (رابط)
@@ -102,12 +104,12 @@ async function processAddUrl(url, theme, duration, res) {
                 customDuration: duration ? parseInt(duration) : null
             };
             queue.push(newTweet);
-            saveAndRespond(res);
+            saveAndRespond(res); // التحديث هنا
         } catch (e) { res.status(500).json({ error: 'خطأ في جلب التغريدة' }); }
     } else { res.status(400).json({ error: 'رابط غير صحيح' }); }
 }
 
-// إضافة بطاقة مخصصة (Custom Card)
+// إضافة بطاقة مخصصة
 function processAddCustom(data, res) {
     const newCard = {
         type: 'custom',
@@ -124,19 +126,12 @@ function processAddCustom(data, res) {
         customDuration: data.duration ? parseInt(data.duration) : null
     };
     queue.push(newCard);
-    saveAndRespond(res);
-}
-
-function saveAndRespond(res) {
-    updateAdmin();
-    saveDatabase();
-    res.json({ success: true });
+    saveAndRespond(res); // التحديث هنا
 }
 
 // --- APIs ---
 
 app.post('/api/add', async (req, res) => {
-    // التمييز بين إضافة رابط وإضافة بطاقة مخصصة
     if (req.body.mode === 'custom') {
         processAddCustom(req.body, res);
     } else {
@@ -146,17 +141,21 @@ app.post('/api/add', async (req, res) => {
 });
 
 app.post('/api/edit_tweet', (req, res) => {
-    const { index, theme, duration, togglePin, toggleBreaking } = req.body;
+    const { index, theme, duration, togglePin, toggleBreaking, newTitle, newText } = req.body;
     if (queue[index]) {
         if (!queue[index].customSettings) queue[index].customSettings = {};
         
+        // تعديل الإعدادات
         if (theme) queue[index].customSettings.theme = theme;
         if (duration !== undefined) queue[index].customDuration = duration ? parseInt(duration) : null;
         if (togglePin) queue[index].customSettings.pinned = !queue[index].customSettings.pinned;
         if (toggleBreaking) queue[index].customSettings.breaking = !queue[index].customSettings.breaking;
+
+        // تعديل المحتوى (الميزة الجديدة)
+        if (newTitle !== undefined) queue[index].user.name = newTitle;
+        if (newText !== undefined) queue[index].text = newText;
         
         saveDatabase();
-        // إذا تغير شيء مؤثر (مثل التثبيت) والخبر معروض، نعيد تحديث العرض
         if (currentIndex === index) showTweet(index); else updateAdmin();
     }
     res.json({ success: true });
@@ -193,14 +192,14 @@ app.post('/api/manage', (req, res) => {
         else if (index < currentIndex) currentIndex--;
     }
     if (action === 'clear') { queue = []; currentIndex = -1; io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; }
-    saveDatabase(); updateAdmin(); res.json({ success: true });
+    saveAndRespond(res); // استخدمنا دالة الحفظ الموحدة لضمان التحديث
 });
 
-// Stream Deck Helper
+// Helper Routes
 app.get('/trigger_next', (req, res) => { if(queue.length){ showTweet((currentIndex+1)%queue.length); res.send("Next"); } else res.send("Empty"); });
 app.get('/trigger_prev', (req, res) => { if(queue.length){ showTweet((currentIndex-1+queue.length)%queue.length); res.send("Prev"); } else res.send("Empty"); });
 app.get('/trigger_auto', (req, res) => { autoState.active = !autoState.active; if(autoState.active) (currentIndex===-1?showTweet(0):showTweet(currentIndex)); else { clearTimeout(autoState.timer); updateAdmin(); } res.send(autoState.active?"Auto ON":"Auto OFF"); });
 app.get('/hide', (req, res) => { io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; updateAdmin(); res.send('Hidden'); });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Pro Server Ready on ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Server Ready on ${PORT}`));

@@ -6,12 +6,9 @@
     <title>ZairuDuo Studio 🎙️</title>
     <style>
         body { background: #0f0f0f; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 900px; margin: auto; }
-        
-        /* Layout Grid */
         .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
         @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
 
-        /* Generic Styles */
         input, select, button, textarea { padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: white; margin: 5px 0; font-size: 14px; width: 100%; box-sizing: border-box; }
         button { cursor: pointer; font-weight: bold; transition: 0.2s; border: none; }
         button:hover { opacity: 0.9; transform: translateY(-1px); }
@@ -19,31 +16,45 @@
         .box { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .section-title { margin: 0 0 10px 0; font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Tabs */
         .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
         .tab-btn { background: #333; color: #aaa; flex: 1; border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; }
         .tab-btn.active { background: #1d9bf0; color: white; border-bottom: 2px solid white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Specific Buttons */
         .btn-add { background: linear-gradient(45deg, #1d9bf0, #00ba7c); }
         .btn-control { background: #333; border: 1px solid #555; }
         .btn-active-auto { background: #00ba7c; color: white; animation: pulse 2s infinite; }
         
-        /* Queue Item */
-        .tweet-item { background: #1e1e1e; padding: 10px; margin-bottom: 8px; border-radius: 8px; border-right: 4px solid #333; transition: all 0.3s; }
+        /* تصميم القائمة المضغوط */
+        .tweet-item { background: #1e1e1e; padding: 8px; margin-bottom: 6px; border-radius: 6px; border-right: 4px solid #333; transition: all 0.3s; font-size: 13px; }
         .tweet-item.active { border-right-color: #1d9bf0; background: #252a30; }
         .tweet-item.pinned { border-right-color: #e6b800; }
         .tweet-item.breaking { border-right-color: #f91880; background: rgba(249, 24, 128, 0.1); }
 
-        .item-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .controls-row { display: flex; gap: 5px; }
-        .mini-btn { padding: 4px 8px; font-size: 12px; width: auto; }
+        .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; color: #888; font-size: 11px; }
+        
+        /* 🔥 تقليص النص الطويل ليأخذ مساحة صغيرة 🔥 */
+        .item-content { 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            max-width: 100%; 
+            color: #ddd; 
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
 
-        /* Preview Iframe */
-        .preview-container { width: 100%; height: 168px; overflow: hidden; position: relative; background: url('https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png'); background-size: cover; border-radius: 8px; border: 2px solid #333; }
+        .controls-row { display: flex; gap: 4px; }
+        .mini-btn { padding: 4px 8px; font-size: 11px; width: auto; flex: 0; }
+        .play-btn { flex: 1; background: #1d9bf0; color: white; }
+
+        .preview-container { width: 100%; height: 168px; overflow: hidden; position: relative; background: #000; border-radius: 8px; border: 2px solid #333; }
         iframe { width: 1280px; height: 720px; border: none; transform: scale(0.234); transform-origin: top left; pointer-events: none; }
+
+        /* نافذة التعديل المنبثقة */
+        #editModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
+        #editModalContent { background: #222; padding: 20px; border-radius: 10px; width: 400px; border: 1px solid #444; }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
     </style>
@@ -52,71 +63,83 @@
 
 <div class="main-grid">
     <div>
-        <div class="box" style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="box" style="display:flex; justify-content:space-between; align-items:center; padding: 10px;">
             <div><span id="statusIcon">⚪</span> <span id="statusText">...</span></div>
             <div style="display:flex; gap:10px; align-items:center;">
-                <label><input type="checkbox" id="playSound" onchange="updateSettings()" style="width:auto;"> 🔊 صوت</label>
-                <input type="number" id="globalTimer" value="15" style="width:50px; text-align:center;" onchange="updateSettings()" title="المؤقت العام">
+                <label style="font-size:12px;"><input type="checkbox" id="playSound" onchange="updateSettings()" style="width:auto;"> 🔊</label>
+                <input type="number" id="globalTimer" value="15" style="width:50px; text-align:center; padding:5px;" onchange="updateSettings()" title="المؤقت">
             </div>
         </div>
 
         <div class="box" style="border-top: 3px solid #1d9bf0;">
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('link')">🔗 رابط تويتر</button>
-                <button class="tab-btn" onclick="switchTab('custom')">✍️ بطاقة مخصصة</button>
+                <button class="tab-btn active" onclick="switchTab('link')">🔗 رابط</button>
+                <button class="tab-btn" onclick="switchTab('custom')">✍️ مخصص</button>
             </div>
-
             <div id="tab-link" class="tab-content active">
                 <input type="text" id="tweetUrl" placeholder="https://x.com/..." autofocus>
             </div>
-
             <div id="tab-custom" class="tab-content">
-                <input type="text" id="customTitle" placeholder="العنوان (مثلاً: خبر عاجل)">
-                <textarea id="customText" rows="2" placeholder="اكتب نص الخبر هنا..."></textarea>
-                <input type="text" id="customImage" placeholder="رابط صورة (اختياري)">
-                <input type="text" id="customMedia" placeholder="رابط فيديو/صورة كبيرة (اختياري)">
+                <input type="text" id="customTitle" placeholder="العنوان">
+                <textarea id="customText" rows="2" placeholder="النص..."></textarea>
+                <input type="text" id="customImage" placeholder="صورة (اختياري)">
+                <input type="text" id="customMedia" placeholder="ميديا (اختياري)">
             </div>
-
-            <div style="display:flex; gap:5px; margin-top:10px;">
+            <div style="display:flex; gap:5px; margin-top:5px;">
                 <select id="addTheme" style="flex:1;">
                     <option value="classic">كلاسيك</option>
+                    <option value="minimal">ميتال (Minimal)</option>
                     <option value="chunky">ضخم (Chunky)</option>
                     <option value="bubble">فقاعة</option>
-                    <option value="minimal">مينيمال</option>
                 </select>
-                <input type="number" id="addDuration" placeholder="وقت(ث)" style="width:70px; text-align:center;">
+                <input type="number" id="addDuration" placeholder="ثواني" style="width:60px; text-align:center;">
             </div>
-            <button class="btn-add" onclick="addItem()">إضافة للقائمة ➕</button>
+            <button class="btn-add" onclick="addItem()">إضافة ➕</button>
         </div>
 
-        <h3 class="section-title">قائمة التشغيل (<span id="count">0</span>)</h3>
+        <h3 class="section-title">القائمة (<span id="count">0</span>)</h3>
         <div id="queueList"></div>
     </div>
 
     <div>
         <div class="box">
-            <h4 class="section-title">👁️ معاينة البث (Live)</h4>
+            <h4 class="section-title">👁️ Live</h4>
             <div class="preview-container">
                 <iframe src="/overlay.html" scrolling="no"></iframe>
             </div>
         </div>
-
         <div class="box">
-            <h4 class="section-title">🎮 التحكم</h4>
+            <h4 class="section-title">🎮 تحكم</h4>
             <div style="display:flex; gap:5px;">
                 <button class="btn-control" onclick="api('control', {action:'prev'})">⏮️</button>
                 <button class="btn-control" onclick="api('control', {action:'next'})">⏭️</button>
             </div>
-            <button id="btnAuto" class="btn-control" style="width:100%; margin-top:5px;" onclick="api('control', {action:'toggle_auto'})">تشغيل تلقائي ⏯️</button>
-            <button class="btn-control" style="width:100%; margin-top:5px; background:#f91880; color:white;" onclick="api('control', {action:'hide'})">إخفاء نهائي ⏹️</button>
+            <button id="btnAuto" class="btn-control" style="width:100%; margin-top:5px;" onclick="api('control', {action:'toggle_auto'})">تلقائي ⏯️</button>
+            <button class="btn-control" style="width:100%; margin-top:5px; background:#f91880; color:white;" onclick="api('control', {action:'hide'})">إخفاء ⏹️</button>
         </div>
-
         <div class="box">
-            <h4 class="section-title">⚙️ ظهور العناصر</h4>
-            <label><input type="checkbox" id="showAvatar" onchange="updateSettings()" style="width:auto;"> صورة</label>
-            <label><input type="checkbox" id="showName" onchange="updateSettings()" style="width:auto;"> اسم</label>
-            <label><input type="checkbox" id="showMedia" onchange="updateSettings()" style="width:auto;"> ميديا</label>
-            <label><input type="checkbox" id="showDate" onchange="updateSettings()" style="width:auto;"> تاريخ</label>
+            <h4 class="section-title">⚙️ إظهار</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                <label><input type="checkbox" id="showAvatar" onchange="updateSettings()" style="width:auto;"> صورة</label>
+                <label><input type="checkbox" id="showName" onchange="updateSettings()" style="width:auto;"> اسم</label>
+                <label><input type="checkbox" id="showMedia" onchange="updateSettings()" style="width:auto;"> ميديا</label>
+                <label><input type="checkbox" id="showDate" onchange="updateSettings()" style="width:auto;"> تاريخ</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="editModal">
+    <div id="editModalContent">
+        <h3 style="margin-top:0;">تعديل المحتوى</h3>
+        <input type="hidden" id="editIndex">
+        <label>العنوان (الاسم):</label>
+        <input type="text" id="editTitle">
+        <label>النص:</label>
+        <textarea id="editText" rows="4"></textarea>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button onclick="saveEdit()" style="background:#1d9bf0;">حفظ</button>
+            <button onclick="closeEdit()" style="background:#555;">إلغاء</button>
         </div>
     </div>
 </div>
@@ -135,15 +158,13 @@
     }
 
     socket.on('state_update', (state) => {
-        // تحديث الحالة
         document.getElementById('count').innerText = state.queue.length;
-        document.getElementById('statusText').innerText = state.isAuto ? "تلقائي يعمل" : "يدوي";
+        document.getElementById('statusText').innerText = state.isAuto ? "Auto" : "Manual";
         document.getElementById('statusIcon').innerText = state.isAuto ? "🟢" : "⏸️";
         
         const btnAuto = document.getElementById('btnAuto');
         if(state.isAuto) btnAuto.classList.add('btn-active-auto'); else btnAuto.classList.remove('btn-active-auto');
 
-        // تحديث الإعدادات
         if(state.settings) {
             document.getElementById('showAvatar').checked = state.settings.showAvatar;
             document.getElementById('showName').checked = state.settings.showName;
@@ -153,7 +174,6 @@
             document.getElementById('globalTimer').value = state.settings.defaultDuration || 15;
         }
 
-        // بناء القائمة
         const list = document.getElementById('queueList');
         list.innerHTML = '';
         state.queue.forEach((t, i) => {
@@ -163,17 +183,21 @@
             
             div.className = `tweet-item ${i === state.current ? 'active' : ''} ${isPinned ? 'pinned' : ''} ${isBreaking ? 'breaking' : ''}`;
             
+            // هنا نستخدم name أو custom title
+            const displayTitle = t.user.name;
+            const displayText = t.text || 'ميديا';
+
             div.innerHTML = `
-                <div class="item-row">
-                    <div style="flex:1; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                        <b>#${i+1}</b> ${t.text || 'محتوى ميديا'}
-                    </div>
-                    ${isPinned ? '📌' : ''} ${isBreaking ? '🚨' : ''}
+                <div class="item-header">
+                    <span>#${i+1} • ${displayTitle}</span>
+                    <span>${isPinned ? '📌' : ''} ${isBreaking ? '🚨' : ''}</span>
                 </div>
+                <div class="item-content" title="${displayText}">${displayText}</div>
                 <div class="controls-row">
-                    <button class="mini-btn" style="background:#1d9bf0; flex:1;" onclick="api('control', {action:'show', index:${i}})">عرض ▶️</button>
-                    <button class="mini-btn" style="background:${isPinned?'#e6b800':'#333'}" onclick="editItem(${i}, 'togglePin', true)" title="تثبيت (يوقف المؤقت)">📌</button>
-                    <button class="mini-btn" style="background:${isBreaking?'#f91880':'#333'}" onclick="editItem(${i}, 'toggleBreaking', true)" title="خبر عاجل">🚨</button>
+                    <button class="mini-btn play-btn" onclick="api('control', {action:'show', index:${i}})">▶️</button>
+                    <button class="mini-btn" style="background:#444;" onclick="openEdit(${i}, '${displayTitle.replace(/'/g, "\\'")}', '${displayText.replace(/'/g, "\\'").replace(/\n/g, ' ')}')" title="تعديل المحتوى">✏️</button>
+                    <button class="mini-btn" style="background:${isPinned?'#e6b800':'#333'}" onclick="editItem(${i}, 'togglePin', true)" title="تثبيت">📌</button>
+                    <button class="mini-btn" style="background:${isBreaking?'#f91880':'#333'}" onclick="editItem(${i}, 'toggleBreaking', true)" title="عاجل">🚨</button>
                     <button class="mini-btn" style="background:#f00;" onclick="api('manage', {action:'delete', index:${i}})">🗑️</button>
                 </div>
             `;
@@ -184,7 +208,6 @@
     function addItem() {
         const theme = document.getElementById('addTheme').value;
         const duration = document.getElementById('addDuration').value;
-
         let payload = { mode: currentMode, theme, duration };
 
         if (currentMode === 'link') {
@@ -200,12 +223,8 @@
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         }).then(() => {
-            // تنظيف الحقول
             if(currentMode==='link') document.getElementById('tweetUrl').value = '';
-            else {
-                document.getElementById('customTitle').value = '';
-                document.getElementById('customText').value = '';
-            }
+            else { document.getElementById('customTitle').value = ''; document.getElementById('customText').value = ''; }
         });
     }
 
@@ -220,6 +239,24 @@
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ index, [actionType]: val })
         });
+    }
+
+    // Modal Functions
+    function openEdit(index, title, text) {
+        document.getElementById('editIndex').value = index;
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editText').value = text;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+    function closeEdit() { document.getElementById('editModal').style.display = 'none'; }
+    function saveEdit() {
+        const index = document.getElementById('editIndex').value;
+        const newTitle = document.getElementById('editTitle').value;
+        const newText = document.getElementById('editText').value;
+        fetch('/api/edit_tweet', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ index, newTitle, newText })
+        }).then(() => closeEdit());
     }
 
     function updateSettings() {

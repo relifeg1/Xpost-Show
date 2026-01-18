@@ -20,7 +20,6 @@
             bottom: 50px;
             right: 50px;
             width: 500px;
-            /* الانتقالات السلسة */
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -30,12 +29,11 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 6px;
+            height: 5px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 0 0 16px 16px;
             overflow: hidden;
             display: none;
-            /* يظهر فقط في الوضع التلقائي */
         }
 
         #progress-bar {
@@ -49,15 +47,14 @@
         .media img,
         .media video {
             width: 100%;
-            border-radius: 12px;
+            border-radius: 8px;
             margin-top: 10px;
-            max-height: 450px;
+            max-height: 400px;
             object-fit: contain;
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(0, 0, 0, 0.1);
         }
 
-        /* === Styles (Themes) === */
-        /* Classic */
+        /* === 1. Classic === */
         .style-classic .card {
             background: #fff;
             border-radius: 16px;
@@ -97,14 +94,66 @@
             white-space: pre-wrap;
         }
 
-        .style-classic .date {
-            color: #555;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            display: block;
+        /* === 2. Minimal (Metal) - REFIXED === */
+        /* تصميم جديد كلياً لإصلاح مشاكل التداخل والخلفية */
+        .style-minimal .card {
+            background: rgba(15, 15, 20, 0.9);
+            /* خلفية داكنة شبه شفافة */
+            backdrop-filter: blur(10px);
+            /* تأثير ضبابي */
+            border-right: 6px solid #1d9bf0;
+            /* خط ملون على اليمين */
+            padding: 15px 20px;
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         }
 
-        /* Chunky */
+        .style-minimal .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .style-minimal .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-left: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .style-minimal .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #eee;
+        }
+
+        .style-minimal .username {
+            color: #888;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+
+        .style-minimal .text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #fff;
+        }
+
+        .style-minimal .media img {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* شريط التقدم في المينيمال يكون ملتصقاً بالحافة السفلية */
+        .style-minimal #progress-bar-container {
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* === 3. Chunky === */
         .style-chunky .card {
             background: #000;
             border: 4px solid #1d9bf0;
@@ -143,7 +192,7 @@
             line-height: 1.2;
         }
 
-        /* Bubble */
+        /* === 4. Bubble === */
         .style-bubble .card {
             background: transparent;
             position: relative;
@@ -188,15 +237,10 @@
             overflow: hidden;
         }
 
-        /* Breaking News Mode 🚨 */
+        /* Breaking News */
         .breaking-mode .card {
-            border: 4px solid #f91880 !important;
+            border: 3px solid #f91880 !important;
             animation: flashBorder 2s infinite;
-        }
-
-        .breaking-mode .name,
-        .breaking-mode .name-badge {
-            color: #f91880 !important;
         }
 
         .breaking-label {
@@ -223,7 +267,7 @@
                 box-shadow: 0 0 0 0 rgba(249, 24, 128, 0.7);
             }
 
-            70% {
+            50% {
                 box-shadow: 0 0 0 10px rgba(249, 24, 128, 0);
             }
 
@@ -236,7 +280,6 @@
 
 <body>
     <div id="container"></div>
-
     <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3"></audio>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -244,40 +287,33 @@
         const socket = io();
         const container = document.getElementById('container');
         const audio = document.getElementById('notifSound');
-        let currentTimer = null;
 
         function renderTweet(data, settings, isBreaking, isPinned) {
             const theme = settings.theme || 'classic';
-
-            // 1. إعداد الكلاسات (Theme + Breaking)
             container.className = `style-${theme} ${isBreaking ? 'breaking-mode' : ''}`;
 
-            // 2. معالجة النصوص والميديا
             const formattedText = data.text.replace(/(https?:\/\/[^\s]+)/g, '');
             let mediaHtml = '';
             if (settings.showMedia && data.mediaDetails && data.mediaDetails.length > 0) {
                 mediaHtml = `<div class="media"><img src="${data.mediaDetails[0].media_url_https}"></div>`;
             }
 
-            // 3. بناء الهيدر
             let headerHtml = '';
             if (settings.showAvatar || settings.showName) {
                 headerHtml += `<div class="header">`;
                 if (settings.showAvatar) headerHtml += `<img class="avatar" src="${data.user.profile_image_url_https.replace('_normal', '')}">`;
                 headerHtml += `<div>`;
                 if (settings.showName) headerHtml += `<div class="name">${data.user.name}</div>`;
-                if (settings.showUsername) headerHtml += `<div class="username">@${data.user.screen_name}</div>`;
+                if (settings.showUsername && theme !== 'chunky') headerHtml += `<div class="username">@${data.user.screen_name}</div>`;
                 headerHtml += `</div></div>`;
             }
 
-            // 4. التذييل (التاريخ)
-            let footerHtml = '';
+            let dateHtml = '';
             if (settings.showDate) {
                 const dateStr = new Date(data.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
-                footerHtml = `<span class="date">${dateStr}</span>`;
+                dateHtml = `<div style="font-size:0.8rem; opacity:0.7; margin-top:5px;">${dateStr}</div>`;
             }
 
-            // 5. بناء HTML النهائي
             let html = `
                 <div class="card animate__animated animate__backInRight">
                     <div class="breaking-label">🚨 خبر عاجل</div>
@@ -287,7 +323,7 @@
                     <div class="${theme === 'bubble' ? 'content-box' : ''}">
                         <div class="text">${formattedText}</div>
                         ${mediaHtml}
-                        ${footerHtml}
+                        ${dateHtml}
                         <div id="progress-bar-container"><div id="progress-bar"></div></div>
                     </div>
                 </div>
@@ -296,30 +332,22 @@
             container.innerHTML = html;
             container.style.display = 'block';
 
-            // 6. تشغيل الصوت
             if (settings.playSound) {
                 audio.volume = 0.5;
-                audio.play().catch(e => console.log("Audio needs interaction first"));
+                audio.play().catch(() => { });
             }
         }
 
-        // دالة تحريك شريط التقدم
         function startProgress(duration, isPinned) {
             const barContainer = document.getElementById('progress-bar-container');
             const bar = document.getElementById('progress-bar');
-
             if (!barContainer || !bar) return;
 
-            // إذا كان مثبت، لا نظهر الشريط أو نجعله ثابتاً
-            if (isPinned) {
-                barContainer.style.display = 'none';
-                return;
-            }
+            if (isPinned) { barContainer.style.display = 'none'; return; }
 
             barContainer.style.display = 'block';
             bar.style.width = '0%';
-            bar.style.transition = 'none'; // ريست
-
+            bar.style.transition = 'none';
             setTimeout(() => {
                 bar.style.transition = `width ${duration}ms linear`;
                 bar.style.width = '100%';
@@ -328,12 +356,7 @@
 
         socket.on('show_tweet', (msg) => {
             renderTweet(msg.data, msg.settings, msg.isBreaking, msg.isPinned);
-
-            // حساب وقت العرض للشريط
             const duration = (msg.data.customDuration || msg.settings.defaultDuration || 15) * 1000;
-
-            // تشغيل الشريط فقط إذا كان الوضع التلقائي يعمل في السيرفر (نحتاج لتمرير حالة الأوتو، لكن هنا سنفترض العمل)
-            // لتحسين الدقة، سنعتمد على أن السيرفر يرسل الحدث كل X ثانية
             startProgress(duration, msg.isPinned);
         });
 
@@ -341,11 +364,9 @@
             const card = document.querySelector('.card');
             if (card) {
                 card.classList.remove('animate__backInRight');
-                card.classList.add('animate__backOutRight'); // تأثير خروج
+                card.classList.add('animate__backOutRight');
                 setTimeout(() => container.style.display = 'none', 500);
-            } else {
-                container.style.display = 'none';
-            }
+            } else { container.style.display = 'none'; }
         });
     </script>
 </body>
