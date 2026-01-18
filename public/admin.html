@@ -4,205 +4,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZairuDuo Controller 🎮</title>
+    <title>ZairuDuo Controller Pro 🎮</title>
     <style>
         body {
-            background: #121212;
-            color: white;
+            background: #0f0f0f;
+            color: #e0e0e0;
             font-family: 'Segoe UI', sans-serif;
             padding: 20px;
-        }
-
-        .container {
-            max-width: 600px;
+            max-width: 700px;
             margin: auto;
         }
 
+        /* الأزرار والإدخال */
         input,
-        button,
-        select {
-            width: 100%;
-            padding: 12px;
-            margin: 5px 0;
-            border-radius: 8px;
-            border: none;
-            font-size: 16px;
-        }
-
-        input {
-            background: #333;
+        select,
+        button {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            background: #222;
             color: white;
+            margin: 5px 0;
+            font-size: 14px;
         }
 
         button {
             cursor: pointer;
             font-weight: bold;
+            transition: 0.2s;
+            border: none;
+        }
+
+        button:hover {
+            opacity: 0.8;
         }
 
         .btn-add {
             background: #1d9bf0;
-            color: white;
+            width: 100%;
         }
 
         .btn-control {
             background: #00ba7c;
             color: white;
             width: 48%;
-            display: inline-block;
         }
 
         .btn-hide {
             background: #f91880;
-            color: white;
-        }
-
-        .tweet-item {
-            background: #1e1e1e;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .tweet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-
-        .tweet-controls {
-            display: flex;
-            gap: 5px;
             width: 100%;
             margin-top: 5px;
         }
 
-        .theme-badge {
-            font-size: 11px;
-            background: #333;
+        /* الصناديق */
+        .box {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+
+        /* إعدادات التبديل (Checkboxes) */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            background: #252525;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .checkbox-label input {
+            margin: 0;
+            width: auto;
+        }
+
+        /* القائمة */
+        .tweet-item {
+            background: #1e1e1e;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-right: 4px solid #333;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tweet-item.active {
+            border-right-color: #1d9bf0;
+            background: #252a30;
+        }
+
+        .item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            background: #151515;
+            padding: 5px;
+            border-radius: 6px;
+        }
+
+        .badge {
+            font-size: 10px;
             padding: 2px 6px;
             border-radius: 4px;
+            background: #333;
             color: #aaa;
         }
 
-        select.mini-select {
+        .timer-input {
+            width: 50px !important;
             padding: 5px;
-            background: #222;
-            color: #fff;
-            font-size: 12px;
-            border: 1px solid #444;
-            width: auto;
-            flex-grow: 1;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h2>🎛️ لوحة تحكم ZairuDuo</h2>
 
-        <div style="background: #2f3336; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
-            <span id="statusText">جارِ الاتصال...</span>
+    <div class="box" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <span id="statusIcon">⚪</span> <span id="statusText">جاري الاتصال...</span>
         </div>
+        <div>
+            <label style="font-size:12px; color:#aaa;">المؤقت العام (ث):</label>
+            <input type="number" id="globalTimer" style="width:50px; text-align:center;"
+                onchange="updateGlobalSettings()">
+        </div>
+    </div>
 
-        <div
-            style="background: #191919; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #333;">
-            <label style="color:#aaa; font-size:14px;">🎨 اختر ستايل التغريدة الجديدة:</label>
-            <select id="addThemeSelector">
-                <option value="chunky">الضخم (للشاشات الصغيرة)</option>
+    <div class="box">
+        <h4 style="margin:0 0 10px 0; font-size:14px; color:#aaa;">⚙️ إعدادات العرض (تطبق على الكل)</h4>
+        <div class="settings-grid">
+            <label class="checkbox-label"><input type="checkbox" id="showAvatar" onchange="updateGlobalSettings()"> صورة
+                العرض</label>
+            <label class="checkbox-label"><input type="checkbox" id="showName" onchange="updateGlobalSettings()">
+                الاسم</label>
+            <label class="checkbox-label"><input type="checkbox" id="showUsername" onchange="updateGlobalSettings()">
+                اليوزر (@)</label>
+            <label class="checkbox-label"><input type="checkbox" id="showDate" onchange="updateGlobalSettings()">
+                التاريخ</label>
+            <label class="checkbox-label"><input type="checkbox" id="showMedia" onchange="updateGlobalSettings()">
+                الصور/الفيديو</label>
+        </div>
+    </div>
+
+    <div class="box" style="border-color: #1d9bf0;">
+        <div style="display:flex; gap:5px; margin-bottom:5px;">
+            <select id="addTheme" style="flex:1;">
+                <option value="classic">كلاسيك (الممتاز) ⭐</option>
+                <option value="chunky">الضخم (Chunky)</option>
                 <option value="bubble">الفقاعة (Bubble)</option>
-                <option value="classic">كلاسيك (Twitter)</option>
                 <option value="minimal">مينيمال (Minimal)</option>
             </select>
-            <input type="text" id="tweetUrl" placeholder="رابط التغريدة...">
-            <button class="btn-add" onclick="addTweet()">إضافة ➕</button>
+            <input type="number" id="addDuration" placeholder="وقت (ث)" style="width:70px; text-align:center;"
+                title="مؤقت خاص لهذه التغريدة">
         </div>
-
-        <div>
-            <button class="btn-control" onclick="control('prev')">⏮️ السابق</button>
-            <button class="btn-control" onclick="control('next')">التالي ⏭️</button>
-        </div>
-        <button class="btn-control" style="width: 100%; margin-top: 5px; background: #e6b800;"
-            onclick="control('toggle_auto')">تشغيل تلقائي ⏯️</button>
-        <button class="btn-hide" style="width: 100%; margin-top: 5px;" onclick="control('hide')">إخفاء 👁️</button>
-
-        <h3>القائمة (<span id="count">0</span>)</h3>
-        <div id="queueList"></div>
+        <input type="text" id="tweetUrl" placeholder="رابط التغريدة..." style="width:100%; box-sizing:border-box;">
+        <button class="btn-add" onclick="addTweet()">إضافة للقائمة ➕</button>
     </div>
+
+    <div style="margin-bottom:15px;">
+        <button class="btn-control" onclick="api('control', {action:'prev'})">⏮️ السابق</button>
+        <button class="btn-control" onclick="api('control', {action:'next'})">التالي ⏭️</button>
+        <button class="btn-control" style="width:100%; margin-top:5px; background:#e6b800;"
+            onclick="api('control', {action:'toggle_auto'})">تشغيل / إيقاف التلقائي ⏯️</button>
+        <button class="btn-hide" onclick="api('control', {action:'hide'})">إخفاء 👁️</button>
+    </div>
+
+    <h3>القائمة (<span id="count">0</span>)</h3>
+    <div id="queueList"></div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
 
+        // تحديث الواجهة عند وصول بيانات من السيرفر
         socket.on('state_update', (state) => {
             document.getElementById('count').innerText = state.queue.length;
-            document.getElementById('statusText').innerText = state.isAuto ? "✅ تلقائي ON" : "⏸️ يدوي OFF";
+            document.getElementById('statusText').innerText = state.isAuto ? "تلقائي ON" : "يدوي OFF";
+            document.getElementById('statusIcon').innerText = state.isAuto ? "🟢" : "⏸️";
 
+            // تحديث الإعدادات العامة
+            if (state.settings) {
+                document.getElementById('showAvatar').checked = state.settings.showAvatar;
+                document.getElementById('showName').checked = state.settings.showName;
+                document.getElementById('showUsername').checked = state.settings.showUsername;
+                document.getElementById('showDate').checked = state.settings.showDate;
+                document.getElementById('showMedia').checked = state.settings.showMedia;
+                document.getElementById('globalTimer').value = state.settings.defaultDuration || 10;
+            }
+
+            // بناء القائمة
             const list = document.getElementById('queueList');
             list.innerHTML = '';
 
             state.queue.forEach((t, i) => {
                 const div = document.createElement('div');
-                div.className = 'tweet-item';
-                div.style.border = (i === state.current) ? '2px solid #1d9bf0' : '1px solid #333';
+                div.className = `tweet-item ${i === state.current ? 'active' : ''}`;
 
-                // إصلاح مشكلة اختفاء القائمة: التأكد من وجود البيانات
-                const currentTheme = (t.customSettings && t.customSettings.theme) ? t.customSettings.theme : 'classic';
+                const theme = t.customSettings?.theme || 'classic';
+                const duration = t.customDuration || ''; // فارغ يعني استخدام العام
 
                 div.innerHTML = `
-                    <div class="tweet-header">
-                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">
-                            <span class="theme-badge">${currentTheme}</span>
-                            <b>${i + 1}.</b> ${t.text || 'محتوى ميديا'}
+                    <div class="item-top">
+                        <div style="flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
+                            <span class="badge">${theme}</span>
+                            <b>#${i + 1}</b> ${t.text || 'ميديا'}
                         </div>
-                        <button onclick="manage('delete', ${i})" style="width:auto; padding:5px 10px; background:#f00; font-size:12px;">🗑️</button>
+                        <button onclick="api('manage', {action:'delete', index:${i}})" style="background:#f00; padding:4px 8px; font-size:12px;">🗑️</button>
                     </div>
                     
-                    <div class="tweet-controls">
-                        <button onclick="control('show', ${i})" style="width:auto; padding:5px 15px; background:#1d9bf0;">تشغيل ▶️</button>
+                    <div class="item-controls">
+                        <button onclick="api('control', {action:'show', index:${i}})" style="background:#1d9bf0; flex:1;">عرض ▶️</button>
                         
-                        <select class="mini-select" onchange="changeTweetTheme(${i}, this.value)">
-                            <option value="chunky" ${currentTheme == 'chunky' ? 'selected' : ''}>ضخم</option>
-                            <option value="bubble" ${currentTheme == 'bubble' ? 'selected' : ''}>فقاعة</option>
-                            <option value="classic" ${currentTheme == 'classic' ? 'selected' : ''}>كلاسيك</option>
-                            <option value="minimal" ${currentTheme == 'minimal' ? 'selected' : ''}>مينيمال</option>
+                        <select class="mini-input" onchange="editTweet(${i}, 'theme', this.value)" style="width:80px; margin:0;">
+                            <option value="classic" ${theme == 'classic' ? 'selected' : ''}>كلاسيك</option>
+                            <option value="chunky" ${theme == 'chunky' ? 'selected' : ''}>ضخم</option>
+                            <option value="bubble" ${theme == 'bubble' ? 'selected' : ''}>فقاعة</option>
+                            <option value="minimal" ${theme == 'minimal' ? 'selected' : ''}>مينيمال</option>
                         </select>
+
+                        <input type="number" class="timer-input" value="${duration}" placeholder="عام" 
+                               onchange="editTweet(${i}, 'duration', this.value)" title="وقت خاص بالثواني (اتركه فارغاً للعام)">
                     </div>
                 `;
                 list.appendChild(div);
             });
         });
 
+        // دوال الاتصال بالسيرفر
+        function api(endpoint, data) {
+            // تحويل اسم الدالة المختصر إلى المسار الكامل
+            const path = endpoint === 'manage' ? '/api/manage' : '/api/control';
+            fetch(path, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+        }
+
         function addTweet() {
             const url = document.getElementById('tweetUrl').value;
-            const theme = document.getElementById('addThemeSelector').value;
+            const theme = document.getElementById('addTheme').value;
+            const duration = document.getElementById('addDuration').value;
+
             fetch('/api/add', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, theme })
+                body: JSON.stringify({ url, theme, duration })
             }).then(() => document.getElementById('tweetUrl').value = '');
         }
 
-        function changeTweetTheme(index, newTheme) {
+        function editTweet(index, type, value) {
             fetch('/api/edit_tweet', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ index, theme: newTheme })
+                body: JSON.stringify({ index, [type]: value })
             });
         }
 
-        function control(action, index) {
-            fetch('/api/control', {
+        function updateGlobalSettings() {
+            const settings = {
+                showAvatar: document.getElementById('showAvatar').checked,
+                showName: document.getElementById('showName').checked,
+                showUsername: document.getElementById('showUsername').checked,
+                showDate: document.getElementById('showDate').checked,
+                showMedia: document.getElementById('showMedia').checked,
+                defaultDuration: parseInt(document.getElementById('globalTimer').value) || 10
+            };
+            fetch('/api/settings', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action, index })
-            });
-        }
-
-        function manage(action, index) {
-            fetch('/api/manage', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action, index })
+                body: JSON.stringify(settings)
             });
         }
     </script>

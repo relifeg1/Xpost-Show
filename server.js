@@ -18,26 +18,31 @@ let queue = [];
 let currentIndex = -1;
 let autoState = { active: false, timer: null };
 
-// الإعدادات العامة
+// الإعدادات العامة الافتراضية
 let globalSettings = { 
-    showAvatar: true, showName: true, showMedia: true, 
-    showStats: true, showDate: true, scale: 1.0, 
-    defaultDuration: 10
+    theme: 'classic', 
+    showAvatar: true, 
+    showName: true, 
+    showUsername: true,
+    showMedia: true, 
+    showDate: true, 
+    scale: 1.0, 
+    defaultDuration: 10 // المؤقت العام بالثواني
 };
 
-// تحميل البيانات
+// --- دوال الحفظ والاسترجاع ---
 async function loadDatabase() {
     try {
         const res = await axios.get(API_URL);
         const data = res.data;
-        if (data && data.queue) {
-            queue = data.queue;
+        if (data) {
+            if (data.queue) queue = data.queue;
+            if (data.settings) globalSettings = { ...globalSettings, ...data.settings };
             updateAdmin();
         }
     } catch (e) { console.error("⚠️ خطأ تحميل البيانات:", e.message); }
 }
 
-// حفظ البيانات
 async function saveDatabase() {
     try {
         const payload = { queue, settings: globalSettings, updatedAt: new Date().toISOString() };
@@ -48,7 +53,12 @@ async function saveDatabase() {
 loadDatabase();
 
 function updateAdmin() {
-    io.emit('state_update', { queue, current: currentIndex, isAuto: autoState.active, settings: globalSettings });
+    io.emit('state_update', { 
+        queue, 
+        current: currentIndex, 
+        isAuto: autoState.active, 
+        settings: globalSettings 
+    });
 }
 
 function showTweet(index) {
@@ -56,23 +66,29 @@ function showTweet(index) {
     currentIndex = index;
     const tweet = queue[currentIndex];
     
-    // دمج إعدادات التغريدة الخاصة (الثيم) مع الإعدادات العامة
-    const finalSettings = { ...globalSettings, ...(tweet.customSettings || {}) };
+    // دمج الإعدادات: إعدادات الثيم الخاصة بالتغريدة + الإعدادات العامة للظهور والإخفاء
+    const finalSettings = { 
+        ...globalSettings, 
+        theme: (tweet.customSettings && tweet.customSettings.theme) ? tweet.customSettings.theme : globalSettings.theme
+    };
 
     io.emit('show_tweet', { 
-        data: tweet, index: currentIndex + 1, total: queue.length, settings: finalSettings
+        data: tweet, 
+        index: currentIndex + 1, 
+        total: queue.length, 
+        settings: finalSettings 
     });
     updateAdmin();
 
     if (autoState.active) {
         clearTimeout(autoState.timer);
+        // الأولوية للمؤقت الخاص، وإذا لم يوجد نستخدم العام
         const duration = (tweet.customDuration || globalSettings.defaultDuration) * 1000;
         autoState.timer = setTimeout(() => { showTweet((currentIndex + 1) % queue.length); }, duration);
     }
 }
 
-// إضافة تغريدة جديدة مع الثيم المختار
-async function processAdd(url, theme, res) {
+async function processAdd(url, theme, duration, res) {
     const idMatch = url && url.match(/(?:twitter|x)\.com\/.*\/status\/(\d+)/);
     if (idMatch && idMatch[1]) {
         if (queue.find(t => t.id_str === idMatch[1])) {
@@ -81,11 +97,10 @@ async function processAdd(url, theme, res) {
         try {
             const resp = await axios.get(`https://cdn.syndication.twimg.com/tweet-result?id=${idMatch[1]}&token=x`);
             
-            // 🔥 هنا يتم تثبيت الثيم للتغريدة 🔥
             const newTweet = { 
                 ...resp.data, 
                 customSettings: { theme: theme || 'classic' }, 
-                customDuration: null 
+                customDuration: duration ? parseInt(duration) : null // حفظ المؤقت الخاص إن وجد
             };
             
             queue.push(newTweet);
@@ -96,26 +111,32 @@ async function processAdd(url, theme, res) {
     } else { return res.status(400).json({ error: 'Invalid URL' }); }
 }
 
-// تعديل تغريدة موجودة (لتغيير الثيم لاحقاً)
+// --- APIs ---
+
+app.post('/api/add', async (req, res) => {
+    let { url, theme, duration } = req.body;
+    if (url) await processAdd(url, theme, duration, res); else res.status(400).json({ error: 'No URL' });
+});
+
 app.post('/api/edit_tweet', (req, res) => {
-    const { index, theme } = req.body;
+    const { index, theme, duration } = req.body;
     if (queue[index]) {
-        // إنشاء كائن الإعدادات إذا لم يكن موجوداً
         if (!queue[index].customSettings) queue[index].customSettings = {};
-        
-        // تحديث الثيم
-        queue[index].customSettings.theme = theme;
+        if (theme) queue[index].customSettings.theme = theme;
+        if (duration !== undefined) queue[index].customDuration = duration ? parseInt(duration) : null;
         
         saveDatabase();
-        // إذا كانت هي المعروضة حالياً، قم بتحديث الشاشة فوراً
         if (currentIndex === index) showTweet(index); else updateAdmin();
     }
     res.json({ success: true });
 });
 
-app.post('/api/add', async (req, res) => {
-    let { url, theme } = req.body;
-    if (url) await processAdd(url, theme, res); else res.status(400).json({ error: 'No URL' });
+app.post('/api/settings', (req, res) => {
+    globalSettings = { ...globalSettings, ...req.body };
+    io.emit('state_update', { settings: globalSettings });
+    saveDatabase();
+    if (currentIndex !== -1) showTweet(currentIndex);
+    res.json({ success: true });
 });
 
 app.post('/api/control', (req, res) => {

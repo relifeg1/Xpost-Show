@@ -18,82 +18,99 @@
             position: absolute;
             bottom: 50px;
             right: 50px;
-            width: 600px;
+            width: 500px;
+            /* عرض ثابت للتحكم */
             transition: all 0.5s ease;
         }
 
-        /* الثيمات */
+        /* تنسيق الميديا العام لحل مشكلة الصور الطولية */
+        .media img,
+        .media video {
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 10px;
+            /* 🔥 هذا السطر هو الحل السحري للميديا الطويلة 🔥 */
+            max-height: 450px;
+            object-fit: contain;
+            background: rgba(0, 0, 0, 0.05);
+            /* خلفية خفيفة إذا كانت الصورة صغيرة */
+        }
+
+        /* === 1. كلاسيك (المفضل لديك) === */
         .style-classic .card {
             background: #fff;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
             color: #000;
         }
 
         .style-classic .header {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .style-classic .avatar {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            margin-left: 15px;
+            margin-left: 12px;
         }
 
         .style-classic .name {
             font-weight: 800;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
         }
 
         .style-classic .username {
             color: #555;
-            font-size: 1.1rem;
+            font-size: 1rem;
+            direction: ltr;
         }
 
         .style-classic .text {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             line-height: 1.4;
-            margin-bottom: 15px;
+            white-space: pre-wrap;
         }
 
-        .style-classic .media img {
-            width: 100%;
-            border-radius: 15px;
+        .style-classic .date {
+            color: #555;
+            font-size: 0.9rem;
             margin-top: 10px;
+            display: block;
         }
 
+        /* === 2. Chunky (الضخم) === */
         .style-chunky .card {
             background: #000;
             border: 4px solid #1d9bf0;
-            border-radius: 30px;
-            padding: 30px;
+            border-radius: 20px;
+            padding: 20px;
             color: #fff;
-            box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 0 8px rgba(0, 0, 0, 0.5);
         }
 
         .style-chunky .header {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
             border-bottom: 2px solid #333;
             padding-bottom: 10px;
+            margin-bottom: 10px;
         }
 
         .style-chunky .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 15px;
-            margin-left: 20px;
-            border: 3px solid #fff;
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            margin-left: 15px;
+            border: 2px solid #fff;
         }
 
         .style-chunky .name {
             font-weight: 900;
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: #1d9bf0;
         }
 
@@ -101,19 +118,20 @@
             display: none;
         }
 
+        /* نخفي اليوزر لتوفير المساحة */
         .style-chunky .text {
-            font-size: 2.8rem;
+            font-size: 2rem;
             font-weight: 900;
             line-height: 1.2;
-            margin-bottom: 20px;
         }
 
+        /* إجبار الميديا في الستايل الضخم ألا تأخذ مساحة كبيرة */
         .style-chunky .media img {
-            width: 100%;
-            border-radius: 20px;
             border: 2px solid #333;
+            max-height: 350px;
         }
 
+        /* === 3. Bubble (الفقاعة) === */
         .style-bubble .card {
             background: transparent;
         }
@@ -121,92 +139,80 @@
         .style-bubble .header {
             display: flex;
             align-items: center;
-            margin-bottom: -10px;
+            margin-bottom: -15px;
             position: relative;
             z-index: 2;
         }
 
         .style-bubble .avatar {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            border: 4px solid #fff;
+            border: 3px solid #fff;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .style-bubble .name-box {
+        .style-bubble .name-badge {
             background: #1d9bf0;
             color: white;
-            padding: 5px 15px;
+            padding: 4px 12px;
             border-radius: 20px;
-            margin-right: -20px;
             font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: -15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
-        .style-bubble .text-box {
+        .style-bubble .content-box {
             background: #fff;
             color: #000;
-            padding: 25px 30px;
-            border-radius: 0 30px 30px 30px;
-            font-size: 1.8rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-top: 10px;
-            font-weight: 700;
-        }
-
-        .style-bubble .media img {
+            padding: 20px 20px;
             border-radius: 20px;
-            margin-top: 15px;
-            width: 100%;
+            border-top-right-radius: 0;
+            font-size: 1.3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-top: 5px;
+            font-weight: 600;
         }
 
+        /* === 4. Minimal === */
         .style-minimal .card {
-            background: linear-gradient(90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 100%);
-            border-left: 10px solid #1d9bf0;
-            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-right: 6px solid #1d9bf0;
+            padding: 15px;
             color: white;
-            border-radius: 5px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
         }
 
         .style-minimal .header {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .style-minimal .avatar {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             margin-left: 10px;
         }
 
         .style-minimal .name {
             font-weight: bold;
-            font-size: 1.2rem;
             color: #ddd;
         }
 
-        .style-minimal .username {
-            display: none;
-        }
-
         .style-minimal .text {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            text-shadow: 2px 2px 4px #000;
-        }
-
-        .style-minimal .media img {
-            width: 100%;
-            border-radius: 5px;
-            margin-top: 10px;
         }
     </style>
 </head>
 
 <body>
     <div id="container"></div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
@@ -216,40 +222,81 @@
             const theme = settings.theme || 'classic';
             container.className = `style-${theme}`;
 
+            // 1. معالجة الميديا (صور/فيديو)
             let mediaHtml = '';
-            if (data.mediaDetails && data.mediaDetails.length > 0) {
-                mediaHtml = `<div class="media"><img src="${data.mediaDetails[0].media_url_https}" ></div>`;
+            if (settings.showMedia && data.mediaDetails && data.mediaDetails.length > 0) {
+                // نأخذ أول ميديا فقط للعرض
+                mediaHtml = `<div class="media"><img src="${data.mediaDetails[0].media_url_https}"></div>`;
             }
 
-            let html = `
-                <div class="card animate__animated animate__fadeInUp">
-                    <div class="header">
-                        <img class="avatar" src="${data.user.profile_image_url_https.replace('_normal', '')}">
-                        <div>
-                            <div class="name">${data.user.name}</div>
-                            <div class="username">@${data.user.screen_name}</div>
-                        </div>
-                        ${theme === 'bubble' ? `<div class="name-box">${data.user.name}</div>` : ''} 
-                    </div>
-                    
-                    ${theme === 'bubble' ? `<div class="text-box">${formatText(data.text)} ${mediaHtml}</div>` :
-                    `<div class="text">${formatText(data.text)}</div> ${mediaHtml}`}
-                </div>
-            `;
+            // 2. معالجة النصوص والروابط
+            const formattedText = data.text.replace(/(https?:\/\/[^\s]+)/g, '');
+
+            // 3. بناء الهيدر (صورة + اسم + يوزر)
+            let headerHtml = '';
+            if (settings.showAvatar || settings.showName || settings.showUsername) {
+                headerHtml += `<div class="header">`;
+                if (settings.showAvatar) headerHtml += `<img class="avatar" src="${data.user.profile_image_url_https.replace('_normal', '')}">`;
+                headerHtml += `<div>`;
+                if (settings.showName) headerHtml += `<div class="name">${data.user.name}</div>`;
+                if (settings.showUsername) headerHtml += `<div class="username">@${data.user.screen_name}</div>`;
+                headerHtml += `</div>`;
+                // إضافة خاصة لثيم الفقاعة
+                if (theme === 'bubble' && settings.showName) headerHtml += `<div class="name-badge">${data.user.name}</div>`;
+                headerHtml += `</div>`;
+            }
+
+            // 4. بناء التذييل (التاريخ)
+            let footerHtml = '';
+            if (settings.showDate) {
+                const dateStr = new Date(data.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+                footerHtml = `<span class="date">${dateStr}</span>`;
+            }
+
+            // 5. تجميع القوالب حسب الثيم
+            let html = '';
 
             if (theme === 'bubble') {
-                html = html.replace('<div class="name">', '<div class="name" style="display:none">');
-                html = html.replace('<div class="username">', '<div class="username" style="display:none">');
+                // ثيم الفقاعة له هيكل خاص
+                html = `
+                    <div class="card animate__animated animate__fadeInUp">
+                        ${settings.showAvatar ? `<div class="header"><img class="avatar" src="${data.user.profile_image_url_https}"> ${settings.showName ? `<div class="name-badge">${data.user.name}</div>` : ''}</div>` : ''}
+                        <div class="content-box">
+                            <div class="text">${formattedText}</div>
+                            ${mediaHtml}
+                            ${footerHtml}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // باقي الثيمات (كلاسيك، تشانكي، مينيمال)
+                html = `
+                    <div class="card animate__animated animate__fadeInUp">
+                        ${headerHtml}
+                        <div class="text">${formattedText}</div>
+                        ${mediaHtml}
+                        ${footerHtml}
+                    </div>
+                `;
             }
 
             container.innerHTML = html;
             container.style.display = 'block';
         }
 
-        function formatText(text) { return text.replace(/(https?:\/\/[^\s]+)/g, ''); }
+        socket.on('show_tweet', (msg) => {
+            renderTweet(msg.data, msg.settings);
+        });
 
-        socket.on('show_tweet', (msg) => { renderTweet(msg.data, msg.settings); });
-        socket.on('hide_tweet', () => { container.style.display = 'none'; });
+        socket.on('hide_tweet', () => {
+            container.style.display = 'none';
+        });
+
+        // تحديث فوري للإعدادات إذا كان هناك تغريدة معروضة
+        socket.on('state_update', (state) => {
+            // ميزة إضافية: لو أردت تحديث التغريدة المعروضة فوراً عند ضغط Checkbox يمكنك تفعيل هذا
+            // لكن سنكتفي بالتحديث عند العرض التالي لتجنب الرمش
+        });
     </script>
 </body>
 
