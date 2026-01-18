@@ -8,13 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
         :root {
-            /* القيم الافتراضية */
             --global-scale: 1.0;
             --card-width: 500px;
             --card-height: auto;
             --card-overflow: visible;
-
-            /* الألوان */
             --bg-color: #000000;
             --text-color: #ffffff;
             --sub-text: #888888;
@@ -24,7 +21,6 @@
             --glass-bg: rgba(0, 0, 0, 0.85);
         }
 
-        /* Color Modes */
         body.mode-light {
             --bg-color: #ffffff;
             --text-color: #000000;
@@ -50,21 +46,16 @@
             font-family: 'Cairo', sans-serif;
         }
 
-        /* 🔥 الحاوية الرئيسية: هي التي تتحكم بالحجم والزوم 🔥 */
         #container {
             display: none;
             position: absolute;
             bottom: 50px;
             right: 50px;
-
-            /* تطبيق المتغيرات بصرامة */
             width: var(--card-width) !important;
             height: var(--card-height) !important;
             transform: scale(var(--global-scale));
             transform-origin: bottom right;
-            /* التكبير يبدأ من الزاوية */
-
-            transition: width 0.3s ease, height 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s ease;
         }
 
         .media img,
@@ -95,16 +86,14 @@
             background: var(--accent-color);
         }
 
-        /* === توحيد الخصائص لكل الثيمات لتستجيب للأبعاد === */
         .card,
         .content-box {
             box-sizing: border-box;
-            /* مهم جداً لعدم تجاوز الحدود */
             width: 100%;
             height: 100%;
-            /* لملء الحاوية في حال تحديد الارتفاع */
         }
 
+        /* === الثيمات === */
         /* 1. Classic */
         .style-classic .card {
             background: var(--bg-color);
@@ -273,7 +262,6 @@
             margin-top: 5px;
             border: 1px solid var(--border-color);
             flex-grow: 1;
-            /* لتعبئة المساحة المتبقية */
             overflow: var(--card-overflow);
         }
 
@@ -299,6 +287,21 @@
 
         .breaking-mode .breaking-label {
             display: block;
+        }
+
+        /* 🔥 تعديلات خاصة للمخصص 🔥 */
+        .type-custom .header {
+            justify-content: center !important;
+            margin-bottom: 5px !important;
+        }
+
+        .type-custom .name,
+        .type-custom .name-badge {
+            font-size: 1.8rem !important;
+            /* تكبير العنوان */
+            color: var(--accent-color) !important;
+            text-align: center;
+            width: 100%;
         }
 
         @keyframes flashBorder {
@@ -328,7 +331,6 @@
         const container = document.getElementById('container');
         const audio = document.getElementById('notifSound');
 
-        // 🔥 دالة منفصلة لتطبيق الأبعاد فوراً 🔥
         function applyGeometry(settings) {
             const scale = settings.scale || 1.0;
             const width = settings.cardWidth || 500;
@@ -336,7 +338,6 @@
             const height = settings.cardHeight || 400;
             const colorMode = settings.colorMode || 'dark';
 
-            // CSS Variables Update
             document.documentElement.style.setProperty('--global-scale', scale);
             document.documentElement.style.setProperty('--card-width', width + 'px');
 
@@ -351,57 +352,82 @@
             document.body.className = `mode-${colorMode}`;
         }
 
-        // استقبال التحديثات اللحظية من لوحة التحكم
         socket.on('state_update', (state) => {
-            if (state.settings) {
-                applyGeometry(state.settings);
-            }
+            if (state.settings) applyGeometry(state.settings);
         });
 
         function renderTweet(data, settings, isBreaking, isPinned) {
             const theme = settings.theme || 'classic';
-
-            // نطبق الأبعاد أيضاً عند الرسم
             applyGeometry(settings);
 
-            container.className = `style-${theme} ${isBreaking ? 'breaking-mode' : ''}`;
+            const isCustom = data.type === 'custom';
+            container.className = `style-${theme} ${isBreaking ? 'breaking-mode' : ''} ${isCustom ? 'type-custom' : ''}`;
 
-            const formattedText = data.text.replace(/(https?:\/\/[^\s]+)/g, '');
+            const formattedText = data.text ? data.text.replace(/(https?:\/\/[^\s]+)/g, '') : '';
+
             let mediaHtml = '';
             if (settings.showMedia && data.mediaDetails && data.mediaDetails.length > 0) {
                 mediaHtml = `<div class="media"><img src="${data.mediaDetails[0].media_url_https}"></div>`;
             }
 
+            // 🔥 بناء الهيدر بذكاء: إذا مخصص، لا تضع صورة ولا يوزر أصلاً 🔥
             let headerHtml = '';
-            if (settings.showAvatar || settings.showName) {
-                headerHtml += `<div class="header">`;
-                if (settings.showAvatar) headerHtml += `<img class="avatar" src="${data.user.profile_image_url_https.replace('_normal', '')}">`;
-                headerHtml += `<div class="user-info">`;
-                if (settings.showName) headerHtml += `<div class="name">${data.user.name}</div>`;
-                if (settings.showUsername && theme !== 'chunky') headerHtml += `<div class="username">@${data.user.screen_name}</div>`;
-                headerHtml += `</div></div>`;
+            if (isCustom) {
+                // للمخصص: فقط الاسم (العنوان)
+                if (theme === 'bubble') {
+                    headerHtml = `<div class="header" style="justify-content:center"><div class="name-badge">${data.user.name}</div></div>`;
+                } else {
+                    headerHtml = `<div class="header" style="justify-content:center; text-align:center;"><div class="name">${data.user.name}</div></div>`;
+                }
+            } else {
+                // للتغريدات العادية: كل شيء
+                if (settings.showAvatar || settings.showName) {
+                    headerHtml += `<div class="header">`;
+                    if (settings.showAvatar) headerHtml += `<img class="avatar" src="${data.user.profile_image_url_https.replace('_normal', '')}">`;
+                    headerHtml += `<div class="user-info">`;
+                    if (settings.showName) headerHtml += `<div class="name">${data.user.name}</div>`;
+                    if (settings.showUsername && theme !== 'chunky') headerHtml += `<div class="username">@${data.user.screen_name}</div>`;
+                    headerHtml += `</div></div>`;
+                }
             }
 
+            // التاريخ لا يظهر في المخصص
             let dateHtml = '';
-            if (settings.showDate) {
+            if (settings.showDate && !isCustom) {
                 const dateStr = new Date(data.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
                 dateHtml = `<div style="font-size:0.8rem; opacity:0.7; margin-top:8px;">${dateStr}</div>`;
             }
 
-            let html = `
-                <div class="card animate__animated animate__backInRight">
-                    <div class="breaking-label">🚨 خبر عاجل</div>
-                    ${theme === 'bubble' ? '' : headerHtml}
-                    ${theme === 'bubble' && settings.showAvatar ? `<div class="header"><img class="avatar" src="${data.user.profile_image_url_https}"> <div class="name-badge">${data.user.name}</div></div>` : ''}
-                    
-                    <div class="${theme === 'bubble' ? 'content-box' : ''}">
+            // تجميع HTML النهائي
+            let html = '';
+
+            if (theme === 'bubble') {
+                html = `
+                    <div class="card animate__animated animate__backInRight">
+                        <div class="breaking-label">🚨 خبر عاجل</div>
+                        ${headerHtml} 
+                        
+                        <div class="content-box">
+                            <div class="text">${formattedText}</div>
+                            ${mediaHtml}
+                            ${dateHtml}
+                            <div id="progress-bar-container"><div id="progress-bar"></div></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="card animate__animated animate__backInRight">
+                        <div class="breaking-label">🚨 خبر عاجل</div>
+                        ${headerHtml}
+                        
                         <div class="text">${formattedText}</div>
                         ${mediaHtml}
                         ${dateHtml}
                         <div id="progress-bar-container"><div id="progress-bar"></div></div>
                     </div>
-                </div>
-            `;
+                `;
+            }
 
             container.innerHTML = html;
             container.style.display = 'block';
@@ -409,6 +435,7 @@
             if (settings.playSound) { audio.volume = 0.5; audio.play().catch(() => { }); }
         }
 
+        // ... (باقي الكود كما هو)
         function startProgress(duration, isPinned) {
             const bar = document.getElementById('progress-bar');
             if (!bar) return;
