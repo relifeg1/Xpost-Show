@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
         :root {
+            /* Variables controlled by JS */
+            --global-scale: 1.0;
+            --card-width: 500px;
+            --card-height: auto;
+            --card-overflow: visible;
+
             /* Default Dark Mode */
             --bg-color: #000000;
             --text-color: #ffffff;
@@ -49,11 +55,15 @@
             position: absolute;
             bottom: 50px;
             right: 50px;
-            width: 500px;
-            transition: all 0.5s ease;
+
+            /* Apply Geometry */
+            width: var(--card-width);
+            height: var(--card-height);
+            transform: scale(var(--global-scale));
+            transform-origin: bottom right;
+            transition: all 0.3s ease;
         }
 
-        /* Common Elements */
         .media img,
         .media video {
             width: 100%;
@@ -61,6 +71,7 @@
             margin-top: 10px;
             max-height: 400px;
             object-fit: contain;
+            flex-shrink: 1;
             border: 1px solid var(--border-color);
         }
 
@@ -81,7 +92,7 @@
             background: var(--accent-color);
         }
 
-        /* === Theme 1: Classic (Twitter Style) === */
+        /* === Theme 1: Classic === */
         .style-classic .card {
             background: var(--bg-color);
             color: var(--text-color);
@@ -89,6 +100,8 @@
             padding: 20px;
             box-shadow: var(--card-shadow);
             border: 1px solid var(--border-color);
+            height: 100%;
+            box-sizing: border-box;
             position: relative;
         }
 
@@ -131,7 +144,7 @@
             margin-top: 5px;
         }
 
-        /* === Theme 2: Minimal/Glass (Refined) === */
+        /* === Theme 2: Minimal (Glass) === */
         .style-minimal .card {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
@@ -140,6 +153,8 @@
             padding: 15px 20px;
             border-right: 5px solid var(--accent-color);
             box-shadow: var(--card-shadow);
+            height: 100%;
+            box-sizing: border-box;
         }
 
         .style-minimal .header {
@@ -179,15 +194,16 @@
             border-radius: 0 0 12px 12px;
         }
 
-        /* === Theme 3: Chunky (Big Bold) === */
+        /* === Theme 3: Chunky === */
         .style-chunky .card {
             background: #000;
-            /* Always Black */
             border: 4px solid var(--accent-color);
             border-radius: 20px;
             padding: 25px;
             color: #fff;
             box-shadow: 0 10px 0 rgba(0, 0, 0, 1);
+            height: 100%;
+            box-sizing: border-box;
         }
 
         .style-chunky .header {
@@ -260,9 +276,10 @@
             font-size: 1.3rem;
             margin-top: 5px;
             border: 1px solid var(--border-color);
+            height: 100%;
+            box-sizing: border-box;
         }
 
-        /* Breaking News Styling */
         .breaking-mode .card {
             border: 3px solid #f91880 !important;
             animation: flashBorder 2s infinite;
@@ -304,6 +321,7 @@
 </head>
 
 <body class="mode-dark">
+
     <div id="container"></div>
     <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3"></audio>
 
@@ -317,7 +335,18 @@
             const theme = settings.theme || 'classic';
             const colorMode = settings.colorMode || 'dark';
 
-            // Apply Classes
+            // Apply Size & Mode
+            document.documentElement.style.setProperty('--global-scale', settings.scale || 1.0);
+            document.documentElement.style.setProperty('--card-width', (settings.cardWidth || 500) + 'px');
+
+            if (settings.useAutoHeight === false) {
+                document.documentElement.style.setProperty('--card-height', settings.cardHeight + 'px');
+                document.documentElement.style.setProperty('--card-overflow', 'hidden');
+            } else {
+                document.documentElement.style.setProperty('--card-height', 'auto');
+                document.documentElement.style.setProperty('--card-overflow', 'visible');
+            }
+
             document.body.className = `mode-${colorMode}`;
             container.className = `style-${theme} ${isBreaking ? 'breaking-mode' : ''}`;
 
@@ -327,12 +356,10 @@
                 mediaHtml = `<div class="media"><img src="${data.mediaDetails[0].media_url_https}"></div>`;
             }
 
-            // Build Header with correct alignment
             let headerHtml = '';
             if (settings.showAvatar || settings.showName) {
                 headerHtml += `<div class="header">`;
                 if (settings.showAvatar) headerHtml += `<img class="avatar" src="${data.user.profile_image_url_https.replace('_normal', '')}">`;
-
                 headerHtml += `<div class="user-info">`;
                 if (settings.showName) headerHtml += `<div class="name">${data.user.name}</div>`;
                 if (settings.showUsername && theme !== 'chunky') headerHtml += `<div class="username">@${data.user.screen_name}</div>`;
@@ -342,10 +369,9 @@
             let dateHtml = '';
             if (settings.showDate) {
                 const dateStr = new Date(data.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
-                dateHtml = `<div style="font-size:0.8rem; opacity:0.7; margin-top:8px; text-align:left;">${dateStr}</div>`;
+                dateHtml = `<div style="font-size:0.8rem; opacity:0.7; margin-top:8px;">${dateStr}</div>`;
             }
 
-            // Bubble theme logic (Header is outside the content box)
             let html = `
                 <div class="card animate__animated animate__backInRight">
                     <div class="breaking-label">🚨 خبر عاجل</div>
@@ -371,7 +397,6 @@
             const bar = document.getElementById('progress-bar');
             if (!bar) return;
             if (isPinned) { bar.parentElement.style.display = 'none'; return; }
-
             bar.parentElement.style.display = 'block';
             bar.style.width = '0%';
             bar.style.transition = 'none';

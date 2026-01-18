@@ -1,489 +1,259 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZairuDuo Studio Pro 🎨</title>
     <style>
-        body {
-            background: #0f0f0f;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
-            max-width: 1000px;
-            margin: auto;
-        }
+        body { background: #0f0f0f; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 1000px; margin: auto; }
+        .main-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
 
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: 20px;
-        }
+        input, select, button, textarea { padding: 10px; border-radius: 6px; border: 1px solid #333; background: #222; color: white; margin: 5px 0; font-size: 14px; width: 100%; box-sizing: border-box; }
+        button { cursor: pointer; font-weight: bold; transition: 0.2s; border: none; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .box { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .section-title { margin: 0 0 10px 0; font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
-        @media (max-width: 768px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        .tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .tab-btn { background: #333; color: #aaa; flex: 1; border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; }
+        .tab-btn.active { background: #1d9bf0; color: white; border-bottom: 2px solid white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        input,
-        select,
-        button,
-        textarea {
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #333;
-            background: #222;
-            color: white;
-            margin: 5px 0;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box;
+        .btn-add { background: linear-gradient(45deg, #1d9bf0, #00ba7c); }
+        .btn-control { background: #333; border: 1px solid #555; }
+        .btn-active-auto { background: #00ba7c; color: white; animation: pulse 2s infinite; }
+        
+        /* 🔥 تصميم البطاقة بحجم ثابت (Fixed Height) 🔥 */
+        .queue-card { 
+            background: #1e1e1e; border: 1px solid #333; border-right: 4px solid #444; 
+            border-radius: 8px; margin-bottom: 8px; height: 125px; 
+            display: flex; flex-direction: column; justify-content: space-between;
+            overflow: hidden; transition: all 0.2s;
         }
+        .queue-card.active { border-right-color: #1d9bf0; background: #222b33; border-color: #1d9bf0; box-shadow: 0 0 10px rgba(29, 155, 240, 0.1); }
+        .queue-card.pinned { border-right-color: #e6b800; }
+        .queue-card.breaking { border-right-color: #f91880; }
 
-        button {
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-            border: none;
-        }
+        .card-top { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 5px 10px; border-bottom: 1px solid #333; height: 32px; box-sizing: border-box; }
+        .card-index { font-weight: bold; font-size: 12px; color: #666; width: 25px; }
+        .card-title { font-weight: bold; font-size: 13px; color: #fff; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* قص النص الزائد */
+        .card-body { padding: 8px 10px; font-size: 13px; color: #ccc; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+        
+        .card-actions { display: flex; gap: 2px; padding: 5px; background: rgba(0,0,0,0.1); height: 38px; box-sizing: border-box; }
+        .action-btn { flex: 1; padding: 0; font-size: 14px; border-radius: 4px; background: #2a2a2a; color: #aaa; display: flex; justify-content: center; align-items: center; cursor: pointer; border: none; }
+        .action-btn:hover { background: #3a3a3a; color: white; }
+        .btn-play { background: #1d9bf0; color: white; flex: 2; }
+        .btn-delete { background: #3a1111; color: #ff6666; }
+        
+        .mini-btn { background: none; border: none; color: #888; cursor: pointer; padding: 0 5px; }
 
-        button:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        .box {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #333;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .section-title {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-
-        .tab-btn {
-            background: #333;
-            color: #aaa;
-            flex: 1;
-            border-bottom: 2px solid transparent;
-            border-radius: 6px 6px 0 0;
-        }
-
-        .tab-btn.active {
-            background: #1d9bf0;
-            color: white;
-            border-bottom: 2px solid white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .btn-add {
-            background: linear-gradient(45deg, #1d9bf0, #00ba7c);
-        }
-
-        .btn-control {
-            background: #333;
-            border: 1px solid #555;
-        }
-
-        .btn-active-auto {
-            background: #00ba7c;
-            color: white;
-            animation: pulse 2s infinite;
-        }
-
-        /* Queue Card */
-        .queue-card {
-            background: #1e1e1e;
-            border: 1px solid #333;
-            border-right: 4px solid #444;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            height: 125px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-            transition: all 0.2s;
-        }
-
-        .queue-card.active {
-            border-right-color: #1d9bf0;
-            background: #222b33;
-            border-color: #1d9bf0;
-            box-shadow: 0 0 10px rgba(29, 155, 240, 0.1);
-        }
-
-        .queue-card.pinned {
-            border-right-color: #e6b800;
-        }
-
-        .queue-card.breaking {
-            border-right-color: #f91880;
-        }
-
-        .card-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 5px 10px;
-            border-bottom: 1px solid #333;
-            height: 32px;
-            box-sizing: border-box;
-        }
-
-        .card-index {
-            font-weight: bold;
-            font-size: 12px;
-            color: #666;
-            width: 25px;
-        }
-
-        .card-title {
-            font-weight: bold;
-            font-size: 13px;
-            color: #fff;
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-body {
-            padding: 8px 10px;
-            font-size: 13px;
-            color: #ccc;
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.4;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 2px;
-            padding: 5px;
-            background: rgba(0, 0, 0, 0.1);
-            height: 38px;
-            box-sizing: border-box;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 0;
-            font-size: 14px;
-            border-radius: 4px;
-            background: #2a2a2a;
-            color: #aaa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            border: none;
-        }
-
-        .action-btn:hover {
-            background: #3a3a3a;
-            color: white;
-        }
-
-        .btn-play {
-            background: #1d9bf0;
-            color: white;
-            flex: 2;
-        }
-
-        .btn-delete {
-            background: #3a1111;
-            color: #ff6666;
-        }
-
-        .mini-btn {
-            background: none;
-            border: none;
-            color: #888;
-            cursor: pointer;
-            padding: 0 5px;
-        }
-
-        .preview-container {
-            width: 100%;
-            height: 180px;
-            overflow: hidden;
-            position: relative;
-            background: #000;
-            border-radius: 8px;
-            border: 2px solid #333;
-        }
-
-        iframe {
-            width: 1280px;
-            height: 720px;
-            border: none;
-            transform: scale(0.25);
-            transform-origin: top left;
-            pointer-events: none;
-        }
+        .preview-container { width: 100%; height: 180px; overflow: hidden; position: relative; background: #000; border-radius: 8px; border: 2px solid #333; }
+        iframe { width: 1280px; height: 720px; border: none; transform: scale(0.25); transform-origin: top left; pointer-events: none; }
 
         /* Edit Modal */
-        #editModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
+        #editModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
+        #editModalContent { background: #1f1f1f; padding: 25px; border-radius: 12px; width: 450px; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-        #editModalContent {
-            background: #1f1f1f;
-            padding: 25px;
-            border-radius: 12px;
-            width: 450px;
-            border: 1px solid #444;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .color-opt {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: 2px solid #555;
-            cursor: pointer;
-            margin-right: 5px;
-        }
-
-        .color-opt.selected {
-            border-color: #1d9bf0;
-            transform: scale(1.2);
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.8;
-            }
-
-            100% {
-                opacity: 1;
-            }
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
     </style>
 </head>
-
 <body>
 
-    <div class="main-grid">
-        <div>
-            <div class="box" style="display:flex; justify-content:space-between; align-items:center; padding: 10px;">
-                <div><span id="statusIcon">⚪</span> <span id="statusText">...</span></div>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <label style="font-size:12px;"><input type="checkbox" id="playSound" onchange="updateSettings()"
-                            style="width:auto;"> 🔊</label>
-                    <input type="number" id="globalTimer" value="15" style="width:50px; text-align:center; padding:5px;"
-                        onchange="updateSettings()" title="المؤقت العام">
-                </div>
+<div class="main-grid">
+    <div>
+        <div class="box" style="display:flex; justify-content:space-between; align-items:center; padding: 10px;">
+            <div><span id="statusIcon">⚪</span> <span id="statusText">...</span></div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <label style="font-size:12px;"><input type="checkbox" id="playSound" onchange="updateSettings()" style="width:auto;"> 🔊</label>
+                <input type="number" id="globalTimer" value="15" style="width:50px; text-align:center; padding:5px;" onchange="updateSettings()" title="المؤقت العام">
             </div>
-
-            <div class="box" style="border-top: 3px solid #1d9bf0;">
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="switchTab('link')">🔗 رابط</button>
-                    <button class="tab-btn" onclick="switchTab('custom')">✍️ مخصص</button>
-                </div>
-                <div id="tab-link" class="tab-content active">
-                    <input type="text" id="tweetUrl" placeholder="https://x.com/..." autofocus>
-                </div>
-                <div id="tab-custom" class="tab-content">
-                    <input type="text" id="customTitle" placeholder="العنوان (اسم الحساب)">
-                    <textarea id="customText" rows="2" placeholder="محتوى الخبر..."></textarea>
-                    <input type="text" id="customImage" placeholder="صورة شخصية (اختياري)">
-                    <input type="text" id="customMedia" placeholder="صورة الخبر/ميديا (اختياري)">
-                </div>
-                <div style="display:flex; gap:5px; margin-top:5px;">
-                    <select id="addTheme" style="flex:1;">
-                        <option value="classic">كلاسيك (Classic)</option>
-                        <option value="minimal">زجاجي (Glass/Minimal)</option>
-                        <option value="chunky">ضخم (Chunky)</option>
-                        <option value="bubble">فقاعة (Bubble)</option>
-                    </select>
-                    <input type="number" id="addDuration" placeholder="ث (افتراضي)"
-                        style="width:80px; text-align:center;">
-                </div>
-                <button class="btn-add" onclick="addItem()">إضافة ➕</button>
-            </div>
-
-            <h3 class="section-title">قائمة المتابعة (<span id="count">0</span>)</h3>
-            <div id="queueList"></div>
         </div>
 
-        <div>
-            <div class="box">
-                <h4 class="section-title">👁️ Live Preview</h4>
-                <div class="preview-container"><iframe src="/overlay.html" scrolling="no"></iframe></div>
+        <div class="box" style="border-top: 3px solid #1d9bf0;">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('link')">🔗 رابط</button>
+                <button class="tab-btn" onclick="switchTab('custom')">✍️ مخصص</button>
             </div>
+            <div id="tab-link" class="tab-content active">
+                <input type="text" id="tweetUrl" placeholder="https://x.com/..." autofocus>
+            </div>
+            <div id="tab-custom" class="tab-content">
+                <input type="text" id="customTitle" placeholder="العنوان">
+                <textarea id="customText" rows="2" placeholder="محتوى الخبر..."></textarea>
+                <input type="text" id="customImage" placeholder="صورة شخصية (اختياري)">
+                <input type="text" id="customMedia" placeholder="صورة الخبر/ميديا (اختياري)">
+            </div>
+            <div style="display:flex; gap:5px; margin-top:5px;">
+                <select id="addTheme" style="flex:1;">
+                    <option value="classic">كلاسيك (Classic)</option>
+                    <option value="minimal">زجاجي (Minimal)</option>
+                    <option value="chunky">ضخم (Chunky)</option>
+                    <option value="bubble">فقاعة (Bubble)</option>
+                </select>
+                <input type="number" id="addDuration" placeholder="ث (افتراضي)" style="width:80px; text-align:center;">
+            </div>
+            <button class="btn-add" onclick="addItem()">إضافة ➕</button>
+        </div>
 
-            <div class="box">
-                <h4 class="section-title">🎨 ألوان البث (Color Mode)</h4>
-                <div style="display:flex; gap:10px; justify-content:center;">
-                    <button class="btn-control" onclick="changeColorMode('dark')"
-                        style="background:#000; color:#fff;">Dark 🌑</button>
-                    <button class="btn-control" onclick="changeColorMode('dim')"
-                        style="background:#15202b; color:#fff;">Dim 🌘</button>
-                    <button class="btn-control" onclick="changeColorMode('light')"
-                        style="background:#fff; color:#000;">Light ☀️</button>
+        <h3 class="section-title">قائمة المتابعة (<span id="count">0</span>)</h3>
+        <div id="queueList"></div>
+    </div>
+
+    <div>
+        <div class="box">
+            <h4 class="section-title">👁️ Live Preview</h4>
+            <div class="preview-container"><iframe src="/overlay.html" scrolling="no"></iframe></div>
+        </div>
+        
+        <div class="box" style="border-left: 3px solid #e6b800;">
+            <h4 class="section-title">📏 الأبعاد</h4>
+            <div style="margin-bottom: 5px;">
+                <label style="font-size:12px; color:#aaa;">🔍 زوم: <span id="valScale">1.0</span>x</label>
+                <input type="range" id="scale" min="0.5" max="2.0" step="0.1" value="1.0" oninput="document.getElementById('valScale').innerText = this.value; updateSettings()">
+            </div>
+            <div style="margin-bottom: 5px;">
+                <label style="font-size:12px; color:#aaa;">↔️ عرض: <span id="valWidth">500</span>px</label>
+                <input type="range" id="cardWidth" min="300" max="1000" step="10" value="500" oninput="document.getElementById('valWidth').innerText = this.value; updateSettings()">
+            </div>
+            <div>
+                <label style="font-size:12px;"><input type="checkbox" id="useAutoHeight" checked onchange="toggleHeightControl(); updateSettings()" style="width:auto;"> ارتفاع تلقائي</label>
+                <div id="heightControl" style="display:none; margin-top:5px;">
+                    <input type="range" id="cardHeight" min="100" max="800" step="10" value="400" oninput="document.getElementById('valHeight').innerText = this.value + 'px'; updateSettings()">
+                    <span id="valHeight" style="font-size:11px; color:#666;">400px</span>
                 </div>
             </div>
+        </div>
 
-            <div class="box">
-                <h4 class="section-title">🎮 تحكم بالبث</h4>
-                <div style="display:flex; gap:5px;">
-                    <button class="btn-control" onclick="api('control', {action:'prev'})">⏮️</button>
-                    <button class="btn-control" onclick="api('control', {action:'next'})">⏭️</button>
-                </div>
-                <button id="btnAuto" class="btn-control" style="width:100%; margin-top:5px;"
-                    onclick="api('control', {action:'toggle_auto'})">تلقائي ⏯️</button>
-                <button class="btn-control" style="width:100%; margin-top:5px; background:#f91880; color:white;"
-                    onclick="api('control', {action:'hide'})">إخفاء ⏹️</button>
+        <div class="box">
+            <h4 class="section-title">🎨 ألوان البث</h4>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button class="btn-control" onclick="changeColorMode('dark')" style="background:#000; color:#fff;">Dark 🌑</button>
+                <button class="btn-control" onclick="changeColorMode('dim')" style="background:#15202b; color:#fff;">Dim 🌘</button>
+                <button class="btn-control" onclick="changeColorMode('light')" style="background:#fff; color:#000;">Light ☀️</button>
             </div>
+        </div>
 
-            <div class="box">
-                <h4 class="section-title">⚙️ إظهار العناصر</h4>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                    <label><input type="checkbox" id="showAvatar" onchange="updateSettings()" style="width:auto;">
-                        صورة</label>
-                    <label><input type="checkbox" id="showName" onchange="updateSettings()" style="width:auto;">
-                        اسم</label>
-                    <label><input type="checkbox" id="showMedia" onchange="updateSettings()" style="width:auto;">
-                        ميديا</label>
-                    <label><input type="checkbox" id="showDate" onchange="updateSettings()" style="width:auto;">
-                        تاريخ</label>
-                </div>
+        <div class="box">
+            <h4 class="section-title">🎮 تحكم بالبث</h4>
+            <div style="display:flex; gap:5px;">
+                <button class="btn-control" onclick="api('control', {action:'prev'})">⏮️</button>
+                <button class="btn-control" onclick="api('control', {action:'next'})">⏭️</button>
+            </div>
+            <button id="btnAuto" class="btn-control" style="width:100%; margin-top:5px;" onclick="api('control', {action:'toggle_auto'})">تلقائي ⏯️</button>
+            <button class="btn-control" style="width:100%; margin-top:5px; background:#f91880; color:white;" onclick="api('control', {action:'hide'})">إخفاء ⏹️</button>
+        </div>
+        
+        <div class="box">
+            <h4 class="section-title">⚙️ إظهار العناصر</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                <label><input type="checkbox" id="showAvatar" onchange="updateSettings()" style="width:auto;"> صورة</label>
+                <label><input type="checkbox" id="showName" onchange="updateSettings()" style="width:auto;"> اسم</label>
+                <label><input type="checkbox" id="showMedia" onchange="updateSettings()" style="width:auto;"> ميديا</label>
+                <label><input type="checkbox" id="showDate" onchange="updateSettings()" style="width:auto;"> تاريخ</label>
             </div>
         </div>
     </div>
+</div>
 
-    <div id="editModal">
-        <div id="editModalContent">
-            <h3 style="margin-top:0; border-bottom:1px solid #444; padding-bottom:10px;">تعديل الخبر</h3>
-            <input type="hidden" id="editIndex">
+<div id="editModal">
+    <div id="editModalContent">
+        <h3 style="margin-top:0; border-bottom:1px solid #444; padding-bottom:10px;">تعديل الخبر</h3>
+        <input type="hidden" id="editIndex">
+        
+        <div class="modal-grid">
+            <div><label>العنوان:</label><input type="text" id="editTitle"></div>
+            <div><label>الوقت (ث):</label><input type="number" id="editDuration" placeholder="افتراضي"></div>
+        </div>
+        
+        <label>الثيم:</label>
+        <select id="editTheme" style="margin-bottom:10px;">
+            <option value="classic">كلاسيك</option>
+            <option value="minimal">زجاجي (Minimal)</option>
+            <option value="chunky">ضخم</option>
+            <option value="bubble">فقاعة</option>
+        </select>
 
-            <div class="modal-grid">
-                <div>
-                    <label>العنوان:</label><input type="text" id="editTitle">
-                </div>
-                <div>
-                    <label>الوقت (ثواني):</label><input type="number" id="editDuration" placeholder="افتراضي">
-                </div>
-            </div>
-
-            <label>الثيم:</label>
-            <select id="editTheme" style="margin-bottom:10px;">
-                <option value="classic">كلاسيك</option>
-                <option value="minimal">زجاجي (Minimal)</option>
-                <option value="chunky">ضخم</option>
-                <option value="bubble">فقاعة</option>
-            </select>
-
-            <label>النص:</label><textarea id="editText" rows="4"></textarea>
-
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button onclick="saveEdit()" style="background:#1d9bf0;">حفظ التعديلات</button>
-                <button onclick="closeEdit()" style="background:#555;">إلغاء</button>
-            </div>
+        <label>النص:</label><textarea id="editText" rows="4"></textarea>
+        
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button onclick="saveEdit()" style="background:#1d9bf0;">حفظ</button>
+            <button onclick="closeEdit()" style="background:#555;">إلغاء</button>
         </div>
     </div>
+</div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-        let currentMode = 'link';
-        let queueData = [];
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    let currentMode = 'link';
+    let queueData = [];
 
-        function switchTab(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelector(`.tab-btn[onclick="switchTab('${mode}')"]`).classList.add('active');
-            document.getElementById(`tab-${mode}`).classList.add('active');
+    function switchTab(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector(`.tab-btn[onclick="switchTab('${mode}')"]`).classList.add('active');
+        document.getElementById(`tab-${mode}`).classList.add('active');
+    }
+
+    function toggleHeightControl() {
+        const isAuto = document.getElementById('useAutoHeight').checked;
+        document.getElementById('heightControl').style.display = isAuto ? 'none' : 'block';
+    }
+
+    socket.on('state_update', (state) => {
+        queueData = state.queue;
+        document.getElementById('count').innerText = state.queue.length;
+        document.getElementById('statusText').innerText = state.isAuto ? "Auto" : "Manual";
+        document.getElementById('statusIcon').innerText = state.isAuto ? "🟢" : "⏸️";
+        
+        const btnAuto = document.getElementById('btnAuto');
+        if(state.isAuto) btnAuto.classList.add('btn-active-auto'); else btnAuto.classList.remove('btn-active-auto');
+
+        if(state.settings) {
+            document.getElementById('showAvatar').checked = state.settings.showAvatar;
+            document.getElementById('showName').checked = state.settings.showName;
+            document.getElementById('showMedia').checked = state.settings.showMedia;
+            document.getElementById('showDate').checked = state.settings.showDate;
+            document.getElementById('playSound').checked = state.settings.playSound;
+            document.getElementById('globalTimer').value = state.settings.defaultDuration || 15;
+
+            // Dimensions
+            document.getElementById('scale').value = state.settings.scale || 1.0;
+            document.getElementById('valScale').innerText = state.settings.scale || 1.0;
+            document.getElementById('cardWidth').value = state.settings.cardWidth || 500;
+            document.getElementById('valWidth').innerText = state.settings.cardWidth || 500;
+            document.getElementById('useAutoHeight').checked = state.settings.useAutoHeight ?? true;
+            document.getElementById('cardHeight').value = state.settings.cardHeight || 400;
+            document.getElementById('valHeight').innerText = (state.settings.cardHeight || 400) + 'px';
+            toggleHeightControl();
         }
 
-        socket.on('state_update', (state) => {
-            queueData = state.queue;
-            document.getElementById('count').innerText = state.queue.length;
-            document.getElementById('statusText').innerText = state.isAuto ? "Auto" : "Manual";
-            document.getElementById('statusIcon').innerText = state.isAuto ? "🟢" : "⏸️";
+        renderQueue(state);
+    });
 
-            const btnAuto = document.getElementById('btnAuto');
-            if (state.isAuto) btnAuto.classList.add('btn-active-auto'); else btnAuto.classList.remove('btn-active-auto');
+    function renderQueue(state) {
+        const list = document.getElementById('queueList');
+        list.innerHTML = '';
+        state.queue.forEach((t, i) => {
+            const div = document.createElement('div');
+            const isPinned = t.customSettings?.pinned;
+            const isBreaking = t.customSettings?.breaking;
+            div.className = `queue-card ${i === state.current ? 'active' : ''} ${isPinned ? 'pinned' : ''} ${isBreaking ? 'breaking' : ''}`;
+            
+            const displayTitle = t.user.name;
+            const displayText = t.text || 'ميديا';
 
-            if (state.settings) {
-                document.getElementById('showAvatar').checked = state.settings.showAvatar;
-                document.getElementById('showName').checked = state.settings.showName;
-                document.getElementById('showMedia').checked = state.settings.showMedia;
-                document.getElementById('showDate').checked = state.settings.showDate;
-                document.getElementById('playSound').checked = state.settings.playSound;
-                document.getElementById('globalTimer').value = state.settings.defaultDuration || 15;
-            }
-
-            renderQueue(state);
-        });
-
-        function renderQueue(state) {
-            const list = document.getElementById('queueList');
-            list.innerHTML = '';
-            state.queue.forEach((t, i) => {
-                const div = document.createElement('div');
-                const isPinned = t.customSettings?.pinned;
-                const isBreaking = t.customSettings?.breaking;
-
-                div.className = `queue-card ${i === state.current ? 'active' : ''} ${isPinned ? 'pinned' : ''} ${isBreaking ? 'breaking' : ''}`;
-
-                const displayTitle = t.user.name;
-                const displayText = t.text || 'ميديا';
-
-                div.innerHTML = `
+            div.innerHTML = `
                 <div class="card-top">
                     <div style="display:flex; align-items:center; gap:5px; overflow:hidden;">
-                        <span class="card-index">#${i + 1}</span>
+                        <span class="card-index">#${i+1}</span>
                         <span class="card-title">${displayTitle}</span>
                     </div>
                     <div style="display:flex; align-items:center;">
@@ -495,91 +265,92 @@
                 <div class="card-body" title="${displayText}">${displayText}</div>
                 <div class="card-actions">
                     <button class="action-btn btn-play" onclick="api('control', {action:'show', index:${i}})">تشغيل ▶️</button>
-                    <button class="action-btn" onclick="openEdit(${i})" title="تعديل شامل">✏️</button>
-                    <button class="action-btn" style="color:${isPinned ? '#e6b800' : '#aaa'}" onclick="editItem(${i}, 'togglePin', true)" title="تثبيت">📌</button>
-                    <button class="action-btn" style="color:${isBreaking ? '#f91880' : '#aaa'}" onclick="editItem(${i}, 'toggleBreaking', true)" title="عاجل">🚨</button>
+                    <button class="action-btn" onclick="openEdit(${i})" title="تعديل">✏️</button>
+                    <button class="action-btn" style="color:${isPinned?'#e6b800':'#aaa'}" onclick="editItem(${i}, 'togglePin', true)" title="تثبيت">📌</button>
+                    <button class="action-btn" style="color:${isBreaking?'#f91880':'#aaa'}" onclick="editItem(${i}, 'toggleBreaking', true)" title="عاجل">🚨</button>
                     <button class="action-btn btn-delete" onclick="api('manage', {action:'delete', index:${i}})">🗑️</button>
                 </div>
             `;
-                list.appendChild(div);
-            });
+            list.appendChild(div);
+        });
+    }
+
+    function addItem() {
+        const theme = document.getElementById('addTheme').value;
+        const duration = document.getElementById('addDuration').value;
+        let payload = { mode: currentMode, theme, duration };
+
+        if (currentMode === 'link') payload.url = document.getElementById('tweetUrl').value;
+        else {
+            payload.title = document.getElementById('customTitle').value;
+            payload.text = document.getElementById('customText').value;
+            payload.image = document.getElementById('customImage').value;
+            payload.mediaUrl = document.getElementById('customMedia').value;
         }
 
-        function addItem() {
-            const theme = document.getElementById('addTheme').value;
-            const duration = document.getElementById('addDuration').value;
-            let payload = { mode: currentMode, theme, duration };
+        fetch('/api/add', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) })
+        .then(() => {
+            if(currentMode==='link') document.getElementById('tweetUrl').value = '';
+            else { document.getElementById('customTitle').value = ''; document.getElementById('customText').value = ''; }
+        });
+    }
 
-            if (currentMode === 'link') payload.url = document.getElementById('tweetUrl').value;
-            else {
-                payload.title = document.getElementById('customTitle').value;
-                payload.text = document.getElementById('customText').value;
-                payload.image = document.getElementById('customImage').value;
-                payload.mediaUrl = document.getElementById('customMedia').value;
-            }
+    function api(endpoint, data) {
+        fetch(endpoint === 'manage' ? '/api/manage' : '/api/control', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+    }
 
-            fetch('/api/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-                .then(() => {
-                    if (currentMode === 'link') document.getElementById('tweetUrl').value = '';
-                    else { document.getElementById('customTitle').value = ''; document.getElementById('customText').value = ''; }
-                });
-        }
+    function changeColorMode(mode) {
+        fetch('/api/settings', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ colorMode: mode }) });
+    }
 
-        function api(endpoint, data) {
-            fetch(endpoint === 'manage' ? '/api/manage' : '/api/control', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-        }
+    function editItem(index, actionType, val) {
+        fetch('/api/edit_tweet', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ index, [actionType]: val }) });
+    }
 
-        function changeColorMode(mode) {
-            fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ colorMode: mode }) });
-        }
+    function openEdit(index) {
+        const tweet = queueData[index];
+        if(!tweet) return;
+        document.getElementById('editIndex').value = index;
+        document.getElementById('editTitle').value = tweet.user.name;
+        document.getElementById('editText').value = tweet.text;
+        document.getElementById('editDuration').value = tweet.customDuration || '';
+        document.getElementById('editTheme').value = tweet.customSettings?.theme || 'classic';
+        document.getElementById('editModal').style.display = 'flex';
+    }
 
-        function editItem(index, actionType, val) {
-            fetch('/api/edit_tweet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ index, [actionType]: val }) });
-        }
+    function closeEdit() { document.getElementById('editModal').style.display = 'none'; }
+    
+    function saveEdit() {
+        const index = document.getElementById('editIndex').value;
+        fetch('/api/edit_tweet', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                index,
+                newTitle: document.getElementById('editTitle').value,
+                newText: document.getElementById('editText').value,
+                duration: document.getElementById('editDuration').value,
+                theme: document.getElementById('editTheme').value
+            })
+        }).then(() => closeEdit());
+    }
 
-        function openEdit(index) {
-            const tweet = queueData[index];
-            if (!tweet) return;
-
-            document.getElementById('editIndex').value = index;
-            document.getElementById('editTitle').value = tweet.user.name;
-            document.getElementById('editText').value = tweet.text;
-            document.getElementById('editDuration').value = tweet.customDuration || '';
-            document.getElementById('editTheme').value = tweet.customSettings?.theme || 'classic';
-
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function closeEdit() { document.getElementById('editModal').style.display = 'none'; }
-
-        function saveEdit() {
-            const index = document.getElementById('editIndex').value;
-            fetch('/api/edit_tweet', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    index,
-                    newTitle: document.getElementById('editTitle').value,
-                    newText: document.getElementById('editText').value,
-                    duration: document.getElementById('editDuration').value,
-                    theme: document.getElementById('editTheme').value
-                })
-            }).then(() => closeEdit());
-        }
-
-        function updateSettings() {
-            fetch('/api/settings', {
-                method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    showAvatar: document.getElementById('showAvatar').checked,
-                    showName: document.getElementById('showName').checked,
-                    showMedia: document.getElementById('showMedia').checked,
-                    showDate: document.getElementById('showDate').checked,
-                    playSound: document.getElementById('playSound').checked,
-                    defaultDuration: parseInt(document.getElementById('globalTimer').value) || 15
-                })
-            });
-        }
-    </script>
+    function updateSettings() {
+        fetch('/api/settings', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                showAvatar: document.getElementById('showAvatar').checked,
+                showName: document.getElementById('showName').checked,
+                showMedia: document.getElementById('showMedia').checked,
+                showDate: document.getElementById('showDate').checked,
+                playSound: document.getElementById('playSound').checked,
+                defaultDuration: parseInt(document.getElementById('globalTimer').value) || 15,
+                scale: parseFloat(document.getElementById('scale').value),
+                cardWidth: parseInt(document.getElementById('cardWidth').value),
+                useAutoHeight: document.getElementById('useAutoHeight').checked,
+                cardHeight: parseInt(document.getElementById('cardHeight').value)
+            })
+        });
+    }
+</script>
 </body>
-
 </html>

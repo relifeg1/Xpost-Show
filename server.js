@@ -18,9 +18,17 @@ let queue = [];
 let currentIndex = -1;
 let autoState = { active: false, timer: null };
 
+// الإعدادات العامة (تم توسيعها)
 let globalSettings = { 
     theme: 'classic', 
     colorMode: 'dark', // light, dark, dim
+    
+    // إعدادات الأبعاد الجديدة
+    scale: 1.0,
+    cardWidth: 500,
+    cardHeight: 400,
+    useAutoHeight: true,
+
     showAvatar: true, showName: true, showMedia: true, showDate: true, 
     playSound: true, defaultDuration: 15
 };
@@ -53,7 +61,6 @@ function showTweet(index) {
     currentIndex = index;
     const tweet = queue[currentIndex];
     
-    // دمج الإعدادات: ثيم التغريدة يغلب الثيم العام
     const finalSettings = { 
         ...globalSettings, 
         theme: tweet.customSettings?.theme || globalSettings.theme 
@@ -106,17 +113,14 @@ app.post('/api/edit_tweet', (req, res) => {
     const { index, theme, duration, togglePin, toggleBreaking, newTitle, newText } = req.body;
     if (queue[index]) {
         if (!queue[index].customSettings) queue[index].customSettings = {};
-        
-        if (theme) queue[index].customSettings.theme = theme; // تعديل الثيم
-        if (duration !== undefined) queue[index].customDuration = duration ? parseInt(duration) : null; // تعديل الوقت
+        if (theme) queue[index].customSettings.theme = theme;
+        if (duration !== undefined) queue[index].customDuration = duration ? parseInt(duration) : null;
         if (togglePin) queue[index].customSettings.pinned = !queue[index].customSettings.pinned;
         if (toggleBreaking) queue[index].customSettings.breaking = !queue[index].customSettings.breaking;
         if (newTitle !== undefined) queue[index].user.name = newTitle;
         if (newText !== undefined) queue[index].text = newText;
         
-        updateAdmin();
-        res.json({ success: true });
-        saveDatabase();
+        updateAdmin(); res.json({ success: true }); saveDatabase();
         if (currentIndex === index) showTweet(index);
     }
 });
