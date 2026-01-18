@@ -1,216 +1,211 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZairuDuo Controller 🎮</title>
     <style>
-      body {
-        background: #121212;
-        color: white;
-        font-family: "Segoe UI", sans-serif;
-        padding: 20px;
-      }
-      .container {
-        max-width: 600px;
-        margin: auto;
-      }
-      input,
-      button,
-      select {
-        width: 100%;
-        padding: 12px;
-        margin: 5px 0;
-        border-radius: 8px;
-        border: none;
-        font-size: 16px;
-      }
-      input {
-        background: #333;
-        color: white;
-      }
-      button {
-        cursor: pointer;
-        font-weight: bold;
-      }
-      .btn-add {
-        background: #1d9bf0;
-        color: white;
-      }
-      .btn-control {
-        background: #00ba7c;
-        color: white;
-        width: 48%;
-        display: inline-block;
-      }
-      .btn-hide {
-        background: #f91880;
-        color: white;
-      }
-      .tweet-item {
-        background: #1e1e1e;
-        padding: 15px;
-        margin: 10px 0;
-        border-radius: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .status-bar {
-        background: #2f3336;
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        text-align: center;
-      }
+        body {
+            background: #121212;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
 
-      /* تنسيق قائمة الثيمات */
-      select {
-        background: #444;
-        color: #fff;
-        border: 2px solid #555;
-        cursor: pointer;
-      }
-      label {
-        display: block;
-        margin-top: 10px;
-        color: #aaa;
-        font-size: 14px;
-      }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        input,
+        button,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+        }
+
+        input {
+            background: #333;
+            color: white;
+        }
+
+        button {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-add {
+            background: #1d9bf0;
+            color: white;
+        }
+
+        .btn-control {
+            background: #00ba7c;
+            color: white;
+            width: 48%;
+            display: inline-block;
+        }
+
+        .btn-hide {
+            background: #f91880;
+            color: white;
+        }
+
+        .tweet-item {
+            background: #1e1e1e;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .tweet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .tweet-controls {
+            display: flex;
+            gap: 5px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .theme-badge {
+            font-size: 11px;
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #aaa;
+        }
+
+        select.mini-select {
+            padding: 5px;
+            background: #222;
+            color: #fff;
+            font-size: 12px;
+            border: 1px solid #444;
+            width: auto;
+            flex-grow: 1;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="container">
-      <h2>🎛️ لوحة تحكم ZairuDuo</h2>
+        <h2>🎛️ لوحة تحكم ZairuDuo</h2>
 
-      <div class="status-bar">
-        <span id="statusText">جارِ الاتصال...</span>
+        <div style="background: #2f3336; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+            <span id="statusText">جارِ الاتصال...</span>
+        </div>
+
         <div
-          id="currentThemeDisplay"
-          style="font-size: 12px; color: #1d9bf0; margin-top: 5px"
-        ></div>
-      </div>
+            style="background: #191919; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #333;">
+            <label style="color:#aaa; font-size:14px;">🎨 اختر ستايل التغريدة الجديدة:</label>
+            <select id="addThemeSelector">
+                <option value="chunky">الضخم (للشاشات الصغيرة)</option>
+                <option value="bubble">الفقاعة (Bubble)</option>
+                <option value="classic">كلاسيك (Twitter)</option>
+                <option value="minimal">مينيمال (Minimal)</option>
+            </select>
+            <input type="text" id="tweetUrl" placeholder="رابط التغريدة...">
+            <button class="btn-add" onclick="addTweet()">إضافة ➕</button>
+        </div>
 
-      <div
-        style="
-          background: #191919;
-          padding: 15px;
-          border-radius: 10px;
-          margin-bottom: 15px;
-          border: 1px solid #333;
-        "
-      >
-        <label>🎨 اختر تصميم التغريدة:</label>
-        <select id="themeSelector" onchange="updateSettings()">
-          <option value="classic">كلاسيك (تويتر الرسمي)</option>
-          <option value="chunky">الضخم (للشاشات الصغيرة) 🔥</option>
-          <option value="bubble">الفقاعة (Bubble)</option>
-          <option value="minimal">مينيمال (شفاف وبسيط)</option>
-        </select>
-      </div>
+        <div>
+            <button class="btn-control" onclick="control('prev')">⏮️ السابق</button>
+            <button class="btn-control" onclick="control('next')">التالي ⏭️</button>
+        </div>
+        <button class="btn-control" style="width: 100%; margin-top: 5px; background: #e6b800;"
+            onclick="control('toggle_auto')">تشغيل تلقائي ⏯️</button>
+        <button class="btn-hide" style="width: 100%; margin-top: 5px;" onclick="control('hide')">إخفاء 👁️</button>
 
-      <input
-        type="text"
-        id="tweetUrl"
-        placeholder="الصق رابط التغريدة هنا..."
-      />
-      <button class="btn-add" onclick="addTweet()">إضافة للقائمة ➕</button>
-
-      <div style="margin-top: 15px">
-        <button class="btn-control" onclick="control('prev')">⏮️ السابق</button>
-        <button class="btn-control" onclick="control('next')">التالي ⏭️</button>
-      </div>
-      <button
-        class="btn-control"
-        style="width: 100%; margin-top: 5px; background: #e6b800"
-        onclick="control('toggle_auto')"
-      >
-        تشغيل تلقائي ⏯️
-      </button>
-      <button
-        class="btn-hide"
-        style="width: 100%; margin-top: 5px"
-        onclick="control('hide')"
-      >
-        إخفاء التغريدة 👁️
-      </button>
-
-      <h3>القائمة الحالية (<span id="count">0</span>)</h3>
-      <div id="queueList"></div>
+        <h3>القائمة (<span id="count">0</span>)</h3>
+        <div id="queueList"></div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      const socket = io();
-      let currentSettings = {};
+        const socket = io();
 
-      socket.on("state_update", (state) => {
-        document.getElementById("count").innerText = state.queue.length;
-        document.getElementById("statusText").innerText = state.isAuto
-          ? "✅ الوضع التلقائي يعمل"
-          : "⏸️ الوضع اليدوي";
+        socket.on('state_update', (state) => {
+            document.getElementById('count').innerText = state.queue.length;
+            document.getElementById('statusText').innerText = state.isAuto ? "✅ تلقائي ON" : "⏸️ يدوي OFF";
 
-        // تحديث القائمة
-        const list = document.getElementById("queueList");
-        list.innerHTML = "";
-        state.queue.forEach((t, i) => {
-          const div = document.createElement("div");
-          div.className = "tweet-item";
-          div.style.border = i === state.current ? "2px solid #1d9bf0" : "none";
-          div.innerHTML = `
-                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%;">
-                        ${i + 1}. ${t.text || "صورة/فيديو"}
+            const list = document.getElementById('queueList');
+            list.innerHTML = '';
+
+            state.queue.forEach((t, i) => {
+                const div = document.createElement('div');
+                div.className = 'tweet-item';
+                div.style.border = (i === state.current) ? '2px solid #1d9bf0' : '1px solid #333';
+
+                // إصلاح مشكلة اختفاء القائمة: التأكد من وجود البيانات
+                const currentTheme = (t.customSettings && t.customSettings.theme) ? t.customSettings.theme : 'classic';
+
+                div.innerHTML = `
+                    <div class="tweet-header">
+                        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 80%;">
+                            <span class="theme-badge">${currentTheme}</span>
+                            <b>${i + 1}.</b> ${t.text || 'محتوى ميديا'}
+                        </div>
+                        <button onclick="manage('delete', ${i})" style="width:auto; padding:5px 10px; background:#f00; font-size:12px;">🗑️</button>
                     </div>
-                    <div>
-                        <button onclick="control('show', ${i})" style="width:auto; padding:5px 10px;">▶️</button>
-                        <button onclick="manage('delete', ${i})" style="width:auto; padding:5px 10px; background:#f00;">🗑️</button>
+                    
+                    <div class="tweet-controls">
+                        <button onclick="control('show', ${i})" style="width:auto; padding:5px 15px; background:#1d9bf0;">تشغيل ▶️</button>
+                        
+                        <select class="mini-select" onchange="changeTweetTheme(${i}, this.value)">
+                            <option value="chunky" ${currentTheme == 'chunky' ? 'selected' : ''}>ضخم</option>
+                            <option value="bubble" ${currentTheme == 'bubble' ? 'selected' : ''}>فقاعة</option>
+                            <option value="classic" ${currentTheme == 'classic' ? 'selected' : ''}>كلاسيك</option>
+                            <option value="minimal" ${currentTheme == 'minimal' ? 'selected' : ''}>مينيمال</option>
+                        </select>
                     </div>
                 `;
-          list.appendChild(div);
+                list.appendChild(div);
+            });
         });
 
-        // تحديث اختيار الثيم في القائمة
-        if (state.settings && state.settings.theme) {
-          currentSettings = state.settings;
-          document.getElementById("themeSelector").value = state.settings.theme;
-          document.getElementById("currentThemeDisplay").innerText =
-            `الثيم الحالي: ${state.settings.theme}`;
+        function addTweet() {
+            const url = document.getElementById('tweetUrl').value;
+            const theme = document.getElementById('addThemeSelector').value;
+            fetch('/api/add', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url, theme })
+            }).then(() => document.getElementById('tweetUrl').value = '');
         }
-      });
 
-      function addTweet() {
-        const url = document.getElementById("tweetUrl").value;
-        fetch("/api/add", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url }),
-        }).then(() => (document.getElementById("tweetUrl").value = ""));
-      }
+        function changeTweetTheme(index, newTheme) {
+            fetch('/api/edit_tweet', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ index, theme: newTheme })
+            });
+        }
 
-      function control(action, index) {
-        fetch("/api/control", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action, index }),
-        });
-      }
+        function control(action, index) {
+            fetch('/api/control', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, index })
+            });
+        }
 
-      function manage(action, index) {
-        fetch("/api/manage", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action, index }),
-        });
-      }
-
-      function updateSettings() {
-        const theme = document.getElementById("themeSelector").value;
-        fetch("/api/settings", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ theme }),
-        });
-      }
+        function manage(action, index) {
+            fetch('/api/manage', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, index })
+            });
+        }
     </script>
-  </body>
+</body>
+
 </html>
