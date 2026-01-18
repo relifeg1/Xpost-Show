@@ -19,18 +19,18 @@ let currentIndex = -1;
 let autoState = { active: false, timer: null };
 
 let globalSettings = { 
-    theme: 'classic', showAvatar: true, showName: true, showUsername: true,
-    showMedia: true, showDate: true, playSound: true, defaultDuration: 15
+    theme: 'classic', 
+    colorMode: 'dark', // light, dark, dim
+    showAvatar: true, showName: true, showMedia: true, showDate: true, 
+    playSound: true, defaultDuration: 15
 };
 
-// --- التحميل والحفظ ---
 async function loadDatabase() {
     try {
         const res = await axios.get(API_URL);
-        const data = res.data;
-        if (data) {
-            if (data.queue) queue = data.queue;
-            if (data.settings) globalSettings = { ...globalSettings, ...data.settings };
+        if (res.data) {
+            queue = res.data.queue || [];
+            globalSettings = { ...globalSettings, ...res.data.settings };
             updateAdmin();
         }
     } catch (e) { console.error("⚠️ خطأ تحميل:", e.message); }
@@ -38,17 +38,14 @@ async function loadDatabase() {
 
 async function saveDatabase() {
     try {
-        const payload = { queue, settings: globalSettings, updatedAt: new Date().toISOString() };
-        await axios.put(API_URL, payload, { headers: { 'Content-Type': 'application/json' } });
+        await axios.put(API_URL, { queue, settings: globalSettings, updatedAt: new Date() }, { headers: { 'Content-Type': 'application/json' } });
     } catch (e) { console.error("❌ خطأ الحفظ:", e.message); }
 }
 
 loadDatabase();
 
 function updateAdmin() {
-    io.emit('state_update', { 
-        queue, current: currentIndex, isAuto: autoState.active, settings: globalSettings 
-    });
+    io.emit('state_update', { queue, current: currentIndex, isAuto: autoState.active, settings: globalSettings });
 }
 
 function showTweet(index) {
@@ -56,11 +53,16 @@ function showTweet(index) {
     currentIndex = index;
     const tweet = queue[currentIndex];
     
-    const finalSettings = { ...globalSettings, theme: tweet.customSettings?.theme || globalSettings.theme };
+    // دمج الإعدادات: ثيم التغريدة يغلب الثيم العام
+    const finalSettings = { 
+        ...globalSettings, 
+        theme: tweet.customSettings?.theme || globalSettings.theme 
+    };
 
     io.emit('show_tweet', { 
         data: tweet, index: currentIndex + 1, total: queue.length, 
-        settings: finalSettings, isPinned: tweet.customSettings?.pinned || false, 
+        settings: finalSettings, 
+        isPinned: tweet.customSettings?.pinned || false, 
         isBreaking: tweet.customSettings?.breaking || false
     });
     updateAdmin();
@@ -73,62 +75,50 @@ function showTweet(index) {
     }
 }
 
-// --- معالجة الإضافة السريعة ---
-async function processAdd(req, res) {
+// --- APIs ---
+
+app.post('/api/add', async (req, res) => {
     let newItem = null;
+    const commonData = {
+        customSettings: { theme: req.body.theme || 'classic', pinned: false, breaking: false },
+        customDuration: req.body.duration ? parseInt(req.body.duration) : null
+    };
 
     if (req.body.mode === 'custom') {
         newItem = {
-            type: 'custom', id_str: 'custom_' + Date.now(), text: req.body.text,
-            user: { name: req.body.title || 'مخصص', screen_name: 'ZairuDuo', profile_image_url_https: req.body.image || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png' },
-            created_at: new Date().toISOString(), mediaDetails: req.body.mediaUrl ? [{ media_url_https: req.body.mediaUrl, type: 'photo' }] : [],
-            customSettings: { theme: req.body.theme || 'classic', pinned: false, breaking: false },
-            customDuration: req.body.duration ? parseInt(req.body.duration) : null
+            ...commonData, type: 'custom', id_str: 'cust_' + Date.now(), text: req.body.text,
+            user: { name: req.body.title || 'ZairuDuo', screen_name: 'ZairuDuo', profile_image_url_https: req.body.image || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png' },
+            created_at: new Date().toISOString(), mediaDetails: req.body.mediaUrl ? [{ media_url_https: req.body.mediaUrl }] : []
         };
     } else if (req.body.url) {
         const idMatch = req.body.url.match(/(?:twitter|x)\.com\/.*\/status\/(\d+)/);
-        if (!idMatch) return res.status(400).json({ error: 'رابط غير صحيح' });
-        if (queue.find(t => t.id_str === idMatch[1])) return res.json({ success: false, msg: 'موجود مسبقاً' });
-
+        if (!idMatch) return res.status(400).json({ error: 'رابط خطأ' });
         try {
             const resp = await axios.get(`https://cdn.syndication.twimg.com/tweet-result?id=${idMatch[1]}&token=x`);
-            newItem = { 
-                ...resp.data, type: 'tweet',
-                customSettings: { theme: req.body.theme || 'classic', pinned: false, breaking: false }, 
-                customDuration: req.body.duration ? parseInt(req.body.duration) : null
-            };
-        } catch (e) { return res.status(500).json({ error: 'فشل جلب التغريدة' }); }
+            newItem = { ...resp.data, ...commonData, type: 'tweet' };
+        } catch { return res.status(500).json({ error: 'فشل الجلب' }); }
     }
 
-    if (newItem) {
-        queue.push(newItem);
-        // 🔥 التعديل الجوهري: تحديث الأدمن فوراً قبل الحفظ 🔥
-        updateAdmin(); 
-        res.json({ success: true }); 
-        saveDatabase(); // الحفظ في الخلفية
-    }
-}
-
-// --- APIs ---
-
-app.post('/api/add', processAdd);
+    if (newItem) { queue.push(newItem); updateAdmin(); res.json({ success: true }); saveDatabase(); }
+});
 
 app.post('/api/edit_tweet', (req, res) => {
     const { index, theme, duration, togglePin, toggleBreaking, newTitle, newText } = req.body;
     if (queue[index]) {
         if (!queue[index].customSettings) queue[index].customSettings = {};
-        if (theme) queue[index].customSettings.theme = theme;
-        if (duration !== undefined) queue[index].customDuration = duration ? parseInt(duration) : null;
+        
+        if (theme) queue[index].customSettings.theme = theme; // تعديل الثيم
+        if (duration !== undefined) queue[index].customDuration = duration ? parseInt(duration) : null; // تعديل الوقت
         if (togglePin) queue[index].customSettings.pinned = !queue[index].customSettings.pinned;
         if (toggleBreaking) queue[index].customSettings.breaking = !queue[index].customSettings.breaking;
         if (newTitle !== undefined) queue[index].user.name = newTitle;
         if (newText !== undefined) queue[index].text = newText;
         
-        updateAdmin(); // تحديث فوري
+        updateAdmin();
         res.json({ success: true });
-        saveDatabase(); // حفظ خلفي
+        saveDatabase();
         if (currentIndex === index) showTweet(index);
-    } else res.json({ success: false });
+    }
 });
 
 app.post('/api/settings', (req, res) => {
@@ -161,27 +151,16 @@ app.post('/api/manage', (req, res) => {
         else if (index === currentIndex) showTweet(index % queue.length);
         else if (index < currentIndex) currentIndex--;
     }
-    // 🔥 منطق الترتيب الجديد 🔥
     else if (action === 'move_up' && index > 0) {
-        [queue[index], queue[index - 1]] = [queue[index - 1], queue[index]];
+        [queue[index], queue[index-1]] = [queue[index-1], queue[index]];
         if(currentIndex === index) currentIndex--; else if(currentIndex === index-1) currentIndex++;
     }
     else if (action === 'move_down' && index < queue.length - 1) {
-        [queue[index], queue[index + 1]] = [queue[index + 1], queue[index]];
+        [queue[index], queue[index+1]] = [queue[index+1], queue[index]];
         if(currentIndex === index) currentIndex++; else if(currentIndex === index+1) currentIndex--;
     }
-    else if (action === 'clear') { queue = []; currentIndex = -1; io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; }
-    
-    updateAdmin();
-    res.json({ success: true });
-    saveDatabase();
+    updateAdmin(); res.json({ success: true }); saveDatabase();
 });
-
-// Helper Routes
-app.get('/trigger_next', (req, res) => { if(queue.length){ showTweet((currentIndex+1)%queue.length); res.send("Next"); } else res.send("Empty"); });
-app.get('/trigger_prev', (req, res) => { if(queue.length){ showTweet((currentIndex-1+queue.length)%queue.length); res.send("Prev"); } else res.send("Empty"); });
-app.get('/trigger_auto', (req, res) => { autoState.active = !autoState.active; if(autoState.active) (currentIndex===-1?showTweet(0):showTweet(currentIndex)); else { clearTimeout(autoState.timer); updateAdmin(); } res.send(autoState.active?"Auto ON":"Auto OFF"); });
-app.get('/hide', (req, res) => { io.emit('hide_tweet'); clearTimeout(autoState.timer); autoState.active = false; updateAdmin(); res.send('Hidden'); });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`🚀 Server Ready on ${PORT}`));

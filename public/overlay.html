@@ -7,6 +7,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
+        :root {
+            /* Default Dark Mode */
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --sub-text: #888888;
+            --border-color: #333333;
+            --accent-color: #1d9bf0;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --glass-bg: rgba(0, 0, 0, 0.85);
+        }
+
+        /* Color Modes */
+        body.mode-light {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --sub-text: #536471;
+            --border-color: #eff3f4;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body.mode-dim {
+            --bg-color: #15202b;
+            --text-color: #ffffff;
+            --sub-text: #8b98a5;
+            --border-color: #38444d;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --glass-bg: rgba(21, 32, 43, 0.9);
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -20,224 +50,219 @@
             bottom: 50px;
             right: 50px;
             width: 500px;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.5s ease;
         }
 
-        /* شريط التقدم */
+        /* Common Elements */
+        .media img,
+        .media video {
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 10px;
+            max-height: 400px;
+            object-fit: contain;
+            border: 1px solid var(--border-color);
+        }
+
         #progress-bar-container {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 5px;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 0 0 16px 16px;
             overflow: hidden;
-            display: none;
         }
 
         #progress-bar {
             height: 100%;
             width: 0%;
-            background: #1d9bf0;
-            transition: width linear;
+            background: var(--accent-color);
         }
 
-        /* تنسيق الميديا */
-        .media img,
-        .media video {
-            width: 100%;
-            border-radius: 8px;
-            margin-top: 10px;
-            max-height: 400px;
-            object-fit: contain;
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        /* === 1. Classic === */
+        /* === Theme 1: Classic (Twitter Style) === */
         .style-classic .card {
-            background: #fff;
+            background: var(--bg-color);
+            color: var(--text-color);
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            color: #000;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
             position: relative;
         }
 
         .style-classic .header {
             display: flex;
             align-items: center;
+            gap: 10px;
             margin-bottom: 12px;
         }
 
         .style-classic .avatar {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            margin-left: 12px;
+            object-fit: cover;
+        }
+
+        .style-classic .user-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .style-classic .name {
             font-weight: 800;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            line-height: 1.2;
         }
 
         .style-classic .username {
-            color: #555;
-            font-size: 1rem;
+            color: var(--sub-text);
+            font-size: 0.95rem;
             direction: ltr;
         }
 
         .style-classic .text {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             line-height: 1.4;
             white-space: pre-wrap;
+            margin-top: 5px;
         }
 
-        /* === 2. Minimal (Metal) - REFIXED === */
-        /* تصميم جديد كلياً لإصلاح مشاكل التداخل والخلفية */
+        /* === Theme 2: Minimal/Glass (Refined) === */
         .style-minimal .card {
-            background: rgba(15, 15, 20, 0.9);
-            /* خلفية داكنة شبه شفافة */
-            backdrop-filter: blur(10px);
-            /* تأثير ضبابي */
-            border-right: 6px solid #1d9bf0;
-            /* خط ملون على اليمين */
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            color: var(--text-color);
+            border-radius: 12px;
             padding: 15px 20px;
-            color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border-right: 5px solid var(--accent-color);
+            box-shadow: var(--card-shadow);
         }
 
         .style-minimal .header {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 10px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
         }
 
         .style-minimal .avatar {
-            width: 35px;
-            height: 35px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            margin-left: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .style-minimal .name {
             font-weight: 700;
-            font-size: 1.1rem;
-            color: #eee;
+            font-size: 1rem;
+            color: var(--text-color);
         }
 
         .style-minimal .username {
-            color: #888;
-            font-size: 0.9rem;
+            color: var(--sub-text);
+            font-size: 0.85rem;
             margin-right: 5px;
         }
 
         .style-minimal .text {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 600;
             line-height: 1.3;
-            color: #fff;
         }
 
-        .style-minimal .media img {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* شريط التقدم في المينيمال يكون ملتصقاً بالحافة السفلية */
         .style-minimal #progress-bar-container {
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 12px 12px;
         }
 
-        /* === 3. Chunky === */
+        /* === Theme 3: Chunky (Big Bold) === */
         .style-chunky .card {
             background: #000;
-            border: 4px solid #1d9bf0;
+            /* Always Black */
+            border: 4px solid var(--accent-color);
             border-radius: 20px;
-            padding: 20px;
+            padding: 25px;
             color: #fff;
-            box-shadow: 0 0 0 8px rgba(0, 0, 0, 0.5);
-            position: relative;
+            box-shadow: 0 10px 0 rgba(0, 0, 0, 1);
         }
 
         .style-chunky .header {
             display: flex;
             align-items: center;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
+            gap: 15px;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #333;
+            padding-bottom: 15px;
         }
 
         .style-chunky .avatar {
-            width: 60px;
-            height: 60px;
+            width: 64px;
+            height: 64px;
             border-radius: 12px;
-            margin-left: 15px;
-            border: 2px solid #fff;
+            border: 3px solid #fff;
         }
 
         .style-chunky .name {
             font-weight: 900;
-            font-size: 1.5rem;
-            color: #1d9bf0;
+            font-size: 1.6rem;
+            color: var(--accent-color);
         }
 
         .style-chunky .text {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 900;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
-        /* === 4. Bubble === */
+        /* === Theme 4: Bubble === */
         .style-bubble .card {
             background: transparent;
-            position: relative;
         }
 
         .style-bubble .header {
             display: flex;
             align-items: center;
+            gap: 10px;
             margin-bottom: -15px;
             position: relative;
             z-index: 2;
         }
 
         .style-bubble .avatar {
-            width: 60px;
-            height: 60px;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
-            border: 3px solid #fff;
+            border: 3px solid var(--bg-color);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         .style-bubble .name-badge {
-            background: #1d9bf0;
-            color: white;
+            background: var(--accent-color);
+            color: #fff;
             padding: 4px 12px;
             border-radius: 20px;
             font-weight: bold;
-            margin-right: -15px;
+            font-size: 0.9rem;
         }
 
         .style-bubble .content-box {
-            background: #fff;
-            color: #000;
-            padding: 20px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            padding: 25px 25px 15px 25px;
             border-radius: 20px;
             border-top-right-radius: 0;
-            font-size: 1.3rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-top: 5px;
+            box-shadow: var(--card-shadow);
             font-weight: 600;
-            position: relative;
-            overflow: hidden;
+            font-size: 1.3rem;
+            margin-top: 5px;
+            border: 1px solid var(--border-color);
         }
 
-        /* Breaking News */
+        /* Breaking News Styling */
         .breaking-mode .card {
             border: 3px solid #f91880 !important;
             animation: flashBorder 2s infinite;
@@ -247,11 +272,11 @@
             display: none;
             background: #f91880;
             color: white;
-            padding: 2px 8px;
+            padding: 4px 10px;
             font-size: 12px;
             border-radius: 4px;
             position: absolute;
-            top: -10px;
+            top: -12px;
             left: 20px;
             z-index: 10;
             font-weight: bold;
@@ -278,7 +303,7 @@
     </style>
 </head>
 
-<body>
+<body class="mode-dark">
     <div id="container"></div>
     <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3"></audio>
 
@@ -290,6 +315,10 @@
 
         function renderTweet(data, settings, isBreaking, isPinned) {
             const theme = settings.theme || 'classic';
+            const colorMode = settings.colorMode || 'dark';
+
+            // Apply Classes
+            document.body.className = `mode-${colorMode}`;
             container.className = `style-${theme} ${isBreaking ? 'breaking-mode' : ''}`;
 
             const formattedText = data.text.replace(/(https?:\/\/[^\s]+)/g, '');
@@ -298,11 +327,13 @@
                 mediaHtml = `<div class="media"><img src="${data.mediaDetails[0].media_url_https}"></div>`;
             }
 
+            // Build Header with correct alignment
             let headerHtml = '';
             if (settings.showAvatar || settings.showName) {
                 headerHtml += `<div class="header">`;
                 if (settings.showAvatar) headerHtml += `<img class="avatar" src="${data.user.profile_image_url_https.replace('_normal', '')}">`;
-                headerHtml += `<div>`;
+
+                headerHtml += `<div class="user-info">`;
                 if (settings.showName) headerHtml += `<div class="name">${data.user.name}</div>`;
                 if (settings.showUsername && theme !== 'chunky') headerHtml += `<div class="username">@${data.user.screen_name}</div>`;
                 headerHtml += `</div></div>`;
@@ -311,9 +342,10 @@
             let dateHtml = '';
             if (settings.showDate) {
                 const dateStr = new Date(data.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
-                dateHtml = `<div style="font-size:0.8rem; opacity:0.7; margin-top:5px;">${dateStr}</div>`;
+                dateHtml = `<div style="font-size:0.8rem; opacity:0.7; margin-top:8px; text-align:left;">${dateStr}</div>`;
             }
 
+            // Bubble theme logic (Header is outside the content box)
             let html = `
                 <div class="card animate__animated animate__backInRight">
                     <div class="breaking-label">🚨 خبر عاجل</div>
@@ -332,20 +364,15 @@
             container.innerHTML = html;
             container.style.display = 'block';
 
-            if (settings.playSound) {
-                audio.volume = 0.5;
-                audio.play().catch(() => { });
-            }
+            if (settings.playSound) { audio.volume = 0.5; audio.play().catch(() => { }); }
         }
 
         function startProgress(duration, isPinned) {
-            const barContainer = document.getElementById('progress-bar-container');
             const bar = document.getElementById('progress-bar');
-            if (!barContainer || !bar) return;
+            if (!bar) return;
+            if (isPinned) { bar.parentElement.style.display = 'none'; return; }
 
-            if (isPinned) { barContainer.style.display = 'none'; return; }
-
-            barContainer.style.display = 'block';
+            bar.parentElement.style.display = 'block';
             bar.style.width = '0%';
             bar.style.transition = 'none';
             setTimeout(() => {
